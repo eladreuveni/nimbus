@@ -139,6 +139,10 @@
         box-sizing: border-box;
         font-size: 1.1rem;
       }
+
+      .input-long {
+        width: 100%;
+      }
       label {
         font-size: 1.1rem;
       }
@@ -868,9 +872,10 @@
       }
       return radioContainer;
     }
-    const createInputTypeText = (answer) => {
+    const createInputTypeText = (answer, long) => {
       const inputElement = document.createElement('input');
       if (answer) { inputElement.classList.add('input-gray-bg') }
+      if (long) { inputElement.classList.add('input-long') }
       inputElement.type = 'text';
       inputElement.value = answer || "";
       return inputElement;
@@ -946,7 +951,8 @@
         'Number': () => createInputTypeNumber(questionObj.answer),
         'Date': () => createInputTypeDate(questionObj.answer),
         'Checkbox_Multi_Choice': () => createInputTypeCheckboxMultiChoice(questionObj.options, questionObj.answer, questionObj.max_choice),
-        'Text': () => createInputTypeText(questionObj.answer),
+        'Text': () => createInputTypeText(questionObj.answer, false),
+        'TextLong': () => createInputTypeText(questionObj.answer, true),
         'Textarea': () => createInputTypeTextArea(questionObj.answer),
       }
       const inputFunc = funcs[questionObj.type];

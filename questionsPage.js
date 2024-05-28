@@ -120,7 +120,7 @@ function authenticateByToken(token){
 
 
 function getAllowedEmails() {
-  const users_sheet_cols = getSheetColIndexes(users_sheet)
+  const users_sheet_cols = getSheetColIndexes(users_sheet);
   const numRows = users_sheet.getLastRow() - 1; // exclude the first row
   const user_emails = users_sheet.getRange(2, users_sheet_cols['User_Mail'] + 1, numRows).getValues().flat();
   return user_emails.filter(Boolean);

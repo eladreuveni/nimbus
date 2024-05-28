@@ -139,6 +139,10 @@
         box-sizing: border-box;
         font-size: 1.1rem;
       }
+
+      .input-long {
+        width: 100%;
+      }
       label {
         font-size: 1.1rem;
       }
@@ -868,9 +872,10 @@
       }
       return radioContainer;
     }
-    const createInputTypeText = (answer) => {
+    const createInputTypeText = (answer, long) => {
       const inputElement = document.createElement('input');
       if (answer) { inputElement.classList.add('input-gray-bg') }
+      if (long) { inputElement.classList.add('input-long') }
       inputElement.type = 'text';
       inputElement.value = answer || "";
       return inputElement;
@@ -881,7 +886,6 @@
       inputElement.value = answer;
       return inputElement;
     }
-    
     const createInputTypeCheckboxMultiChoice = (options, answer, max_choice) => {
       const inputElement = document.createElement('div');
       inputElement.classList.add('multi-checkbox-div')
@@ -946,8 +950,9 @@
         'Number': () => createInputTypeNumber(questionObj.answer),
         'Date': () => createInputTypeDate(questionObj.answer),
         'Checkbox_Multi_Choice': () => createInputTypeCheckboxMultiChoice(questionObj.options, questionObj.answer, questionObj.max_choice),
-        'Text': () => createInputTypeText(questionObj.answer),
+        'Text': () => createInputTypeText(questionObj.answer, false),
         'Textarea': () => createInputTypeTextArea(questionObj.answer),
+        'TextLong': () => createInputTypeText(questionObj.answer, true),
       }
       const inputFunc = funcs[questionObj.type];
       const inputElement = inputFunc ? inputFunc() : funcs['Text']() // not suppose to get to Default
@@ -979,7 +984,6 @@
     }
 
     function renderRolesSection(questionData, sectionData) {
-      return; // page5 disabled
       const tableQuestions = questionData.filter(q => (q.position == 'Table'))
       const loader = document.getElementById('insert-roles-section-here') // change later when adding real loader
       const groupContainer = loader.parentElement;
@@ -1265,7 +1269,7 @@
       // Grouping the questions by title
       let questionsGrouped = (pageNum === pageNumberByName['Training']) ? groupQuestionsByPosition(questionData) : groupQuestionsByTitle(questionData);
 
-      if (pageNum === pageNumberByName['Training']) { questionsGrouped = [] } // page Training disabled
+      // if (pageNum === pageNumberByName['Training']) { questionsGrouped = [] } // page Training disabled
       questionsGrouped.forEach((group) => {
         if (!group.length) {return}
         const groupContainer = document.createElement('div'); 

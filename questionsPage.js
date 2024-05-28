@@ -106,7 +106,7 @@ function authenticate(email){
   return randomToken;
 }
 function authenticateByToken(token){
-  const users_sheet_cols = getSheetColIndexes(users_sheet);
+  const users_sheet_cols = getSheetColIndexes(users_sheet)
 
   const users_data = users_sheet.getRange(2, 1, users_sheet.getLastRow()-1 ,users_sheet.getLastColumn()).getValues();
   const userRowIndex = users_data.findIndex(user_data => user_data[users_sheet_cols['Session_Token']] == token);

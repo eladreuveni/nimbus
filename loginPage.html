@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+  <head>
+    <base target="_top">
+    <style>
+      :root {
+        --page-bg-color: #f1f7ff;
+        --form-bg-color: #fff;
+        --main-title-color: #0a3667;
+        --reg-text-color: #0b3058;
+        --gray-text-color: #416682;
+        --active-button-color: #0068f5;
+        --active-button-hover-color: #0066d4;
+        --active-button-click-color: #0047d4;
+        --disabled-button-color: #b6c0cc;
+      }
+      body {
+        font-family: Calibri;
+        background-color: var(--page-bg-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .box-container {
+        width: 300px;
+        padding: 20px;
+        background-color: var(--form-bg-color);
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+      }
+      #existing-user-loader {
+        display: flex;
+        flex-direction: column;
+      }
+      #check-loader {
+        margin: -30px 0;
+      }
+      // loader
+      .lds-ellipsis {
+        /* change color here */
+        color: var(--reg-text-color);
+        margin: auto;
+      }
+      .lds-ellipsis,
+      .lds-ellipsis div {
+        box-sizing: border-box;
+      }
+      .lds-ellipsis {
+        position: relative;
+        width: 80px;
+        height: 80px;
+      }
+      .lds-ellipsis div {
+        position: absolute;
+        top: 33.33333px;
+        width: 13.33333px;
+        height: 13.33333px;
+        border-radius: 50%;
+        background: currentColor;
+        animation-timing-function: cubic-bezier(0, 1, 1, 0);
+      }
+      .lds-ellipsis div:nth-child(1) {
+        left: 8px;
+        animation: lds-ellipsis1 0.6s infinite;
+      }
+      .lds-ellipsis div:nth-child(2) {
+        left: 8px;
+        animation: lds-ellipsis2 0.6s infinite;
+      }
+      .lds-ellipsis div:nth-child(3) {
+        left: 32px;
+        animation: lds-ellipsis2 0.6s infinite;
+      }
+      .lds-ellipsis div:nth-child(4) {
+        left: 56px;
+        animation: lds-ellipsis3 0.6s infinite;
+      }
+      @keyframes lds-ellipsis1 {
+        0% {
+          transform: scale(0);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      @keyframes lds-ellipsis3 {
+        0% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(0);
+        }
+      }
+      @keyframes lds-ellipsis2 {
+        0% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(24px, 0);
+        }
+      }
+      h2 , h3 {
+        text-align: center;
+      }
+      label {
+        font-weight: bold;
+      }
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0 20px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      input[type="button"] {
+        font-family: Calibri;
+        width: 100%;
+        background-color: var(--active-button-color);
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      input[type="button"]:hover {
+        background-color: var(--active-button-hover-color);
+      }
+      input[type="button"]:active {
+        background-color: var(--active-button-click-color);
+      }
+      input[type="button"]:disabled {
+        background-color: var(--disabled-button-color);
+        cursor: not-allowed;
+      }
+      .error-message {
+        color: #ff0000;
+        text-align: center;
+        margin: 0px 0px 10px 0px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div id="form-container" style="display: none;">
+      <h2>התחברות</h2>
+      <form id="loginForm">
+        <label for="email">דואר אלקטרוני:</label>
+        <input type="text" id="email" name="email" onkeyup="inputChanging()">
+
+        <label for="password">סיסמה:</label>
+        <input type="password" id="password" name="password" onkeyup="inputChanging()">
+
+        <p id="loginStatus" class="error-message"></p>
+        <div id="check-loader" style="visibility: hidden;">
+          <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        </div>
+        <input id="login-button" type="button" value="כניסה" onclick="attemptLogin()" disabled="disabled">
+      </form>
+    </div>
+
+    <div id="error-container" class="box-container" style="display: none;">
+      <h2>שגיאה בהתחברות.</h2>
+      <h3>אנא פנה לאחראי לבדיקה.</h3>
+    </div>
+
+    <div id="existing-user-loader">
+      <h3>מחפש משתמש קיים</h3>
+      <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    </div>
+
+    <script>
+      function changePage(page) {
+        document.open();
+        document.write(page);
+        document.close();
+      }
+      function toggleLoad({startLoad}) {
+        document.getElementById("email").style.disabled = !!startLoad
+        document.getElementById("password").style.disabled = !!startLoad
+        document.getElementById("login-button").style.disabled = !!startLoad
+        document.getElementById('check-loader').style.visibility = startLoad ? 'visible' : 'hidden';
+      }
+      function attemptLogin() {
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+
+        google.script.run.withSuccessHandler(loginCallback).checkLogin(emailInput.value, passwordInput.value);
+
+        toggleLoad({startLoad: true})
+      }
+
+      function inputChanging() {
+        document.getElementById("loginStatus").innerHTML = ""
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const loginBtn = document.getElementById("login-button");
+        if (email && password) {
+          loginBtn.disabled = false;
+        } else {
+          loginBtn.disabled = true;
+        }
+      }
+      function invalidToken() {
+        document.getElementById('existing-user-loader').style.display = 'none';
+        document.getElementById('form-container').style.display = 'block';
+      }
+      function loginCallback(token) {
+        if (token) {
+          sessionStorage.setItem('token', token);
+          google.script.run.withSuccessHandler(changePage).goToHomePage('homePage');
+        } else {
+          // toggleLoad({startLoad: false})
+          document.getElementById("existing-user-loader").style.display = 'none';
+          document.getElementById("error-container").style.display = 'block';
+        }
+      }
+      function tokenLoginCallback(userFound) {
+        if (userFound) {
+          google.script.run.withSuccessHandler(changePage).goToHomePage('homePage');
+        } else { invalidToken() }
+      }
+      function onStart() {
+        google.script.run.withSuccessHandler(loginCallback).checkLoginByAllowedEmail();
+      }
+      onStart();
+    </script>
+  </body>
+</html>

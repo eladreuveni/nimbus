@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+  <head>
+    <base target="_top">
+    <!-- <?!= include('styleHomePage'); ?> -->
+    <style>
+      :root {
+        --page-bg-color: #f1f7ff;
+        --form-bg-color: #fff;
+        --main-title-color: #0a3667;
+        --reg-text-color: #0b3058;
+        --gray-text-color: #7b7b7b;
+        --active-button-color: #0068f5;
+        --active-button-hover-color: #0066d4;
+        --active-button-click-color: #0047d4;
+        --disabled-button-color: #b6c0cc;
+        --input-filled-bg: #ECECEC;
+      }
+      html, body {
+        font-family: Calibri;
+        font-size: 16px;
+        margin: 0;
+        padding: 0;
+        background-color: var(--page-bg-color);
+        direction: rtl; 
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      h2 {
+        font-size: 1.25rem
+      }
+      .info-icon {
+        cursor: default;
+        position: relative;
+        display: inline-block;
+        vertical-align: top; /* Align vertically with the text */
+        margin-right: 5px; /* Adjust spacing between the question text and the icon */
+      }
+
+      .info-icon .tooltiptext {
+        visibility: hidden;
+        width: 160px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        top: 100%;
+        left: 50%;
+        margin-left: -80px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .number-button .tooltiptext {
+        visibility: hidden;
+        width: max-content;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        top: 110%;
+        left: 50%;
+        transform: translate(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 1rem;
+      }
+
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      .question {
+        display: inline-block;
+        vertical-align: top;
+        margin-right: 10px; 
+      }
+
+      
+
+      #page1,
+      #page2,
+      #page3,
+      #page4,
+      #page5,
+      #page-thank-you {
+        margin: 0 auto;
+        width: 90%;
+        display: none; /* Hide all pages initially */
+      }
+
+      .group-container {
+        background-color: var(--form-bg-color);
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 1.25rem;
+        margin-bottom: 3rem;
+      }
+      .group-container p {
+        font-size: 1.2rem;
+      }
+
+      .single-question-container {
+        margin: 3rem 0;
+      }
+      .single-question-container div {
+        margin-bottom: 10px;
+      }
+      .single-question-flex {
+        display: flex;
+        align-items: center;
+      }
+      .single-question-flex div {
+        margin-left: 20px;
+      }
+
+      #change-project:disabled {
+        cursor: not-allowed;
+        color: white;
+        background: gray;
+      }
+
+      input[type="text"],
+      select,
+      input[type="radio"],
+      input[type="number"],
+      input[type="date"] {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 1.1rem;
+      }
+      label {
+        font-size: 1.1rem;
+      }
+
+      td select {
+        width: 100%;
+      }
+      .input-gray-bg {
+        background-color: var(--input-filled-bg);
+      }
+
+      button {
+        display: block;
+        padding: 10px 20px;
+        background-color: var(--active-button-color);
+        color: var(--form-bg-color);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+
+      button:hover:enabled {
+        color: white;
+        background-color: var(--active-button-hover-color);
+      }
+      button:active:enabled {
+        color: white;
+        background-color: var(--active-button-click-color);
+      }
+
+      #surveyTitle {
+        display: inline-block; /* Make the survey title inline-block to allow other elements to be on the same line */
+        margin-right: 20px; /* Adjust spacing between survey title and header */
+      }
+
+      
+
+      #officeTitle,
+      #projectTitle {
+        margin-right: 20px;// Adjust spacing between titles and dropdown
+      }
+
+      #header {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        margin-right: 2rem;
+      }
+      #header h1,
+      #header h2 {
+        margin: 0;
+      }
+      #header #logo {
+        height: 12vh;
+        width: auto;
+      }
+
+      #header #titles {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        /* gap: 0.5rem; */
+      }
+
+      #project-dropdown {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        visibility: visible;
+        margin-right: calc(12vh + 3rem); // depends on img height and the margins!!
+        margin-top: 1rem;
+      }
+
+      #project-name-container {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 3px;
+      }
+      #project-dropdown label, .header-label {
+        color: var(--gray-text-color);
+        font-size: 1.1rem;
+      }
+
+      #project-dropdown button {
+        margin-right: 10px;
+      }
+
+      .button-small {
+      display: inline-block; /* Display the button inline */
+      vertical-align: middle; /* Align the button vertically with the text */
+      padding: 5px 10px; /* Adjust padding to make the button smaller */
+      font-size: 0.75rem; /* Reduce font size for a smaller button */
+      background-color: var(--active-button-color); /* Same background color as other buttons */
+      color: var(--form-bg-color); /* White text color */
+      border: none; /* No border */
+      border-radius: 4px; /* Rounded corners */
+      cursor: pointer; /* Show pointer cursor on hover */
+      }
+
+      .button-small:hover {
+        background-color: #0056b3; /* Darker background color on hover */
+      }
+      .question-desc {
+        display: inline-block;
+        vertical-align: middle; /* Align vertically with the icon */
+        font-weight: bold;
+      }
+      .question-text {
+        font-size: 1.1rem;
+      }
+
+      .required-star {
+          color: red;
+          margin-right: 2px; /* Adjust spacing between the icon and the red star */
+          vertical-align: top; /* Align vertically with the text */
+      }
+      
+
+      #page2 {
+        overflow-x: auto; /* Enable horizontal scrolling if the table overflows */
+      }
+
+      .question-table {
+        width: 100%; /* Adjust the width of the table to fill the container */
+        /* max-width: 100%; Ensure the table doesn't exceed the container width */
+
+        max-width: none;
+
+        margin: 0; /* Remove margin to prevent extending beyond the container */
+        padding: 0; /* Remove padding to prevent extending beyond the container */
+        border-collapse: collapse; /* Collapse table borders */
+      }
+
+      .question-table th,
+      .question-table td {
+        border: 1px solid #ddd; /* Add border to table cells */
+        padding: 5px; /* Add padding to table cells */
+        text-align: center; /* Center align table cell content */
+      }
+      #miles-table th,
+      #miles-table td {
+        height: 15vh;
+      }
+      .question-table input,
+      .question-table select,
+      .question-table textarea {
+        width: 100%;
+        font: inherit;
+      }
+      .question-table textarea {
+        height: 100%;
+        resize: none;
+        padding: 5px;
+        box-sizing: border-box;
+      }
+      .button-container {
+        text-align: center;
+        position: relative;
+      }
+      .titles-container {
+        text-align: center;
+        position: relative;
+      }
+      .number-button {
+        display: inline-block;
+        font-family: Comic Sans MS;
+        border-radius: 50%;
+        background-color: white;
+        color: black;
+        text-align: center;
+        font-size: 1.25rem;
+        margin: 15px;
+        cursor: pointer;
+        position: relative; /* Make sure buttons have a stacking context */
+        z-index: 2; /* Ensure buttons are above the line */
+      }
+      .titles-container h5 {
+        display: inline-block;
+        font-family: Comic Sans MS;
+        color: black;
+        text-align: center;
+        font-size: 1.25rem;
+      }
+
+      .number-button:disabled {
+        cursor: not-allowed;
+      }
+
+      .page-ms-disabled {
+        background-color: var(--disabled-button-color) !important;
+      }
+
+      .menu-button-highlighted {
+        color: white;
+        background-color: var(--active-button-color)
+      }
+      .line {
+        position: absolute;
+        width: calc(100% - 50px); /* Set line width to cover space between buttons */
+        height: 2px;
+        background-color: #D3D3D3;
+        top: 50%; /* Position the line at the vertical center of the button container */
+        left: 25px; /* Adjust left position to center the line between buttons */
+        transform: translateY(-50%);
+        z-index: 1; /* Ensure line is behind the buttons */
+      }
+      .add-button-row{
+        display: inline-block;
+        vertical-align: bottom;
+      }
+      .multi-checkbox-div {
+        display: flex;
+        flex-direction: column
+      }
+
+      // loader
+      .lds-default {
+        /* change color here */
+        color: #1c4c5b;
+        right: 50%;
+        transform: translate(50%, 0);
+      }
+      .lds-default,
+      .lds-default div {
+        box-sizing: border-box;
+      }
+      .lds-default {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+      }
+      .lds-default div {
+        position: absolute;
+        width: 6.4px;
+        height: 6.4px;
+        background: currentColor;
+        border-radius: 50%;
+        animation: lds-default 1.2s linear infinite;
+      }
+      .lds-default div:nth-child(1) {
+        animation-delay: 0s;
+        top: 36.8px;
+        left: 66.24px;
+      }
+      .lds-default div:nth-child(2) {
+        animation-delay: -0.1s;
+        top: 22.08px;
+        left: 62.29579px;
+      }
+      .lds-default div:nth-child(3) {
+        animation-delay: -0.2s;
+        top: 11.30421px;
+        left: 51.52px;
+      }
+      .lds-default div:nth-child(4) {
+        animation-delay: -0.3s;
+        top: 7.36px;
+        left: 36.8px;
+      }
+      .lds-default div:nth-child(5) {
+        animation-delay: -0.4s;
+        top: 11.30421px;
+        left: 22.08px;
+      }
+      .lds-default div:nth-child(6) {
+        animation-delay: -0.5s;
+        top: 22.08px;
+        left: 11.30421px;
+      }
+      .lds-default div:nth-child(7) {
+        animation-delay: -0.6s;
+        top: 36.8px;
+        left: 7.36px;
+      }
+      .lds-default div:nth-child(8) {
+        animation-delay: -0.7s;
+        top: 51.52px;
+        left: 11.30421px;
+      }
+      .lds-default div:nth-child(9) {
+        animation-delay: -0.8s;
+        top: 62.29579px;
+        left: 22.08px;
+      }
+      .lds-default div:nth-child(10) {
+        animation-delay: -0.9s;
+        top: 66.24px;
+        left: 36.8px;
+      }
+      .lds-default div:nth-child(11) {
+        animation-delay: -1s;
+        top: 62.29579px;
+        left: 51.52px;
+      }
+      .lds-default div:nth-child(12) {
+        animation-delay: -1.1s;
+        top: 51.52px;
+        left: 62.29579px;
+      }
+      @keyframes lds-default {
+        0%, 20%, 80%, 100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.5);
+        }
+      }
+
+      .prev-next-btns {
+        margin: 10px auto;
+        width: 90%;
+      }
+      .prev-next-btns-flex {
+        display: flex;
+        width: 100%;
+        gap: 40px;
+        justify-content: center;
+      }
+
+      .btns-cell {
+        display: flex;
+        justify-content: space-around;
+        gap: 1vh;
+      }
+      .btns-cell button {
+        padding: 0;
+        width: 4vh;
+        height: 4vh;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .btns-cell button .fa {
+        font-size: 2.5vh;
+      }
+      #plan-image {
+        width: 40%;
+        position: absolute;
+        top: 15%;
+        left: 10%;
+      }
+      #page-intro {
+        width: 90%;
+        margin: auto;
+      }
+      #page-desc-placeholder {
+        font-size: 1.15rem;
+        text-wrap: wrap;
+        line-height: 2rem;
+      }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+<body>
+  <div id="header">
+    <img id="logo" alt="לוגו מערך הדיגיטל"
+      src="https://storageaccountpbiema3c5.blob.core.windows.net/icons/Israel_National_Digital_Agency_Logo.png" />
+    <div id="titles">
+      <h1 id="survey-name">מדד הכשירות ומעקב אחר פרויקטים למעבר לנימבוס</h1>
+      <h2 id="office-name-placeholder"></h2>
+      <div id="project-name-container" style="visibility: hidden;">
+        <span class="header-label">שם הפרויקט:</span>
+        <h2 id="project-name-placeholder"></h2>
+      </div>
+    </div>
+  </div>
+  <div id="project-dropdown" style="visibility: hidden;">
+    <label for="project-selection-dropdown">בחר פרויקט: </label>
+    <select id="project-selection-dropdown" onchange="selectProjectInDropdown(this)">
+      <!-- Project options will be populated here -->
+    </select>
+    <button id="change-project" onclick="confirmProjectChange()" disabled>שנה פרויקט</button>
+  </div>
+
+  <div class="button-container">
+      <button id="top-menu-page1" onclick="pageNumberMenuClicked('1')" class="number-button tooltip menu-button-highlighted" disabled>1</button>
+      <button id="top-menu-page2" onclick="pageNumberMenuClicked('2')" class="number-button tooltip" disabled>2</button>
+      <button id="top-menu-page3" onclick="pageNumberMenuClicked('3')" class="number-button tooltip" disabled>3</button>
+      <button id="top-menu-page4" onclick="pageNumberMenuClicked('4')" class="number-button tooltip" disabled>4</button>
+      <button id="top-menu-page5" onclick="pageNumberMenuClicked('5')" class="number-button tooltip" disabled>5</button>
+    <div class="line"></div>
+  </div>
+
+  <!-- someday --!>
+  <!-- <div class="titles-container">
+      <h5>בקרת פרוייקטים</h5>
+      <h5>אבני דרך פרוייקטליים</h5>
+      <h5>כשירות המשרד למעבר לענן</h5>
+      <h5>חסמי המשרד במעבר לענן</h5>
+  </div> -->
+
+  <div id="loader-container" style="display: block;">
+    <div class="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+  </div>
+
+  <div id="page-intro" style="display: none;">
+    <h2 id="page-title-placeholder"></h2>
+    <p id="page-desc-placeholder"></p>
+  </div>
+
+  <div id="page1" class="page-container" style="display: none;">
+    <!-- Questions for Page 1 -->
+  </div>
+
+  <div id="page2" class="page-container" style="display: none;">
+    <!-- Questions for Page 2 -->
+  </div>
+
+  <div id="page3" class="page-container" style="display: none;">
+    <!-- Questions for Page 3 -->
+  </div>
+
+  <div id="page4" class="page-container" style="display: none;">
+    <!-- Questions for Page 4 -->
+  </div>
+
+  <div id="page5" class="page-container" style="display: none;">
+    <!-- Questions for Page 5 -->
+  </div>
+
+  <div id="page-thank-you" class="page-container" style="display: none;">
+  </div>
+
+  <div id="bottom-buttons-container" class="prev-next-btns" style="display: none;">
+    <div class="prev-next-btns-flex">
+      <button id="prev-btn-bottom" class="nav-btn prev-btn" onclick="prevPage()"></button>
+      <button id="next-btn-bottom" class="nav-btn next-btn" onclick="nextPage()"></button>
+    </div>
+  </div>
+
+
+  <script>
+    let pageNumberByName;
+
+    let global_currentPage = 1;
+    let global_pageFirstTime = {
+      1: false, // firstTime is on login
+      2: true,
+      3: true,
+      4: true,
+      5: true,
+    }
+    let global_myUser = null;
+    let global_myDep = null;
+    let global_myProjects = null;
+    let global_pagesData = null;
+    let global_currentProject = null;
+    let global_missing_required = {
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: []
+    };
+
+    // Official !!
+    function saveAndChangePage(nextPage, prevProjectId) {
+      nextPage = Number(nextPage)
+      // save
+      const finish = (nextPage == 6)
+      const saved = savePageAnswers(global_currentPage, prevProjectId, finish)
+      if (!saved) { return }
+
+      if (nextPage == 6) {
+        populateThankYouPage()
+        return;
+      }
+
+      global_currentPage = nextPage;
+
+      if (global_pageFirstTime[nextPage]) {
+        startLoad();
+        const populate = (questionData) => {
+          populatePage(nextPage, questionData)
+        }
+        google.script.run.withSuccessHandler(populate).getQuestionsForUser(global_myDep.id, global_currentProject.id, nextPage);
+        global_pageFirstTime[nextPage] = false;
+      } else {
+        changePageNoLoad(nextPage)
+      }
+    }
+
+    function pageNumberMenuClicked(numberClicked) { saveAndChangePage(Number(numberClicked), null) }
+
+    function handleButtonsDisplay() {
+      document.querySelectorAll('.prev-next-btns').forEach((container)=> {
+        container.style.display = "block"
+      })
+      const prevVisibility = (global_currentPage == 1) ? 'hidden' : 'visible';
+      const prevText = 'שמור וחזור';
+      
+      const nextVisibility = 'visible';
+      const nextText = (global_currentPage == 5) ? 'שמור וצא' : 'שמור והמשך';
+
+      document.querySelectorAll('.prev-btn').forEach((btn) => {
+        btn.style.visibility = prevVisibility;
+        btn.textContent = prevText;
+      })
+      document.querySelectorAll('.next-btn').forEach((btn) => {
+        btn.style.visibility = nextVisibility;
+        btn.textContent = nextText;
+      })
+    }
+
+    function highlightPageNumberButton(buttonsDisabled) {
+      const topMenuPageButtons = document.querySelectorAll('.number-button')
+      topMenuPageButtons.forEach(b => {
+        b.classList.remove('menu-button-highlighted')
+        b.disabled = buttonsDisabled
+      })
+      document.getElementById(`top-menu-page${global_currentPage}`).classList.add('menu-button-highlighted')
+
+    }
+    function hideAllPages() {
+      const allPages = document.querySelectorAll('.page-container')
+      allPages.forEach(p => { p.style.display = 'none' })
+      document.getElementById('page-intro').style.display = "none"
+    }
+    function specificRestrictions() {
+      // in pages 3,4,5 not possible to reSelect, also if same proj
+      const depPages = [pageNumberByName['Readiness'], pageNumberByName['Barrier'], pageNumberByName['Training']]
+      const isDepPage = (depPages.includes(global_currentPage))
+      const dropdown = document.getElementById('project-selection-dropdown');
+      const sameProj = (dropdown.value == global_currentProject.id)
+
+      dropdown.disabled = isDepPage; // dd
+      document.getElementById('change-project').disabled = isDepPage || sameProj; // btn
+
+      // only funded projects have MS Page
+      const msPageNum = pageNumberByName['MS'];
+      const topMenuMSPage = document.getElementById(`top-menu-page${msPageNum}`);
+      if (global_currentProject.isFunded) {
+        topMenuMSPage.classList.remove(`page-ms-disabled`);
+        topMenuMSPage.disabled = false;
+      } else {
+        topMenuMSPage.classList.add(`page-ms-disabled`);
+        topMenuMSPage.disabled = true;
+      }
+      // buttons according to relevant page
+      handleButtonsDisplay();
+    }
+    function hideNavBtns() {
+      document.querySelectorAll('.prev-next-btns').forEach((container) => {
+        container.style.display = "none"
+      })
+    }
+    function startLoad() {
+      highlightPageNumberButton(true); // true for disable
+      hideAllPages();
+      hideNavBtns();
+      document.getElementById('loader-container').style.display = 'block';
+    }
+
+    function changePageNoLoad() {
+      highlightPageNumberButton(false); // false for not disable
+      hideAllPages();
+
+      showStuff()
+      specificRestrictions()
+    }
+
+    function finishLoad() {
+      const topMenuPageButtons = document.querySelectorAll('.number-button')
+      topMenuPageButtons.forEach(b => { b.disabled = false }) // enable all buttons
+
+      document.getElementById('loader-container').style.display = 'none'; // remove loader
+
+      showStuff()
+      specificRestrictions()
+    }
+
+    function showStuff() {
+      document.getElementById('page-intro').style.display = 'block'; // show intro
+      document.getElementById('page' + global_currentPage).style.display = 'block'; // show page
+      updatePageIntro()
+    }
+
+    function updatePageIntro() {
+      document.getElementById('page-title-placeholder').textContent = global_pagesData[global_currentPage].title;
+      document.getElementById('page-desc-placeholder').innerHTML = global_pagesData[global_currentPage].desc;
+    }
+    function updateOfficeAndProject() {
+      document.getElementById('office-name-placeholder').textContent = global_myDep.name;
+      document.getElementById('project-name-placeholder').textContent = global_currentProject.name;
+    }
+
+    function populatePage(pageNum, questionData) {
+      if (pageNum == pageNumberByName['MS']) {// special ones
+        google.script.run.withSuccessHandler((mile_stones_obj) => {
+          populateQuestionsMSPage(questionData, mile_stones_obj.all_milestones_options, mile_stones_obj.miles_stones, mile_stones_obj.milestones_ans, pageNum);
+        }).getMilesStones(global_currentProject.id);
+        return; // this is it for ms page
+      } 
+      populateQuestions(questionData, pageNum); // for all except MS page
+      if (pageNum == pageNumberByName['Training']) {
+        google.script.run.withSuccessHandler(sectionData => {
+          renderRolesSection(questionData, sectionData);
+        }).getMyRolesAndTrainings(global_myDep.id);
+      }
+    }
+
+    function populateThankYouPage() {
+      const allPages = document.querySelectorAll('.page-container')
+      allPages.forEach(p => { p.style.display = 'none' })
+      hideNavBtns();
+      document.getElementById('loader-container').style.display = 'none';
+      document.getElementById('page-intro').style.display = 'none';
+
+      const pageDiv = document.getElementById("page-thank-you");
+      pageDiv.style.display = 'block';
+      pageDiv.innerHTML = '';
+      const currentGroupContainer = document.createElement('div');
+      currentGroupContainer.classList.add('group-container');
+      const msg = document.createElement('h2');
+      msg.innerHTML = "השאלון הסתיים." + "<br>" + "תודה רבה על שיתוף הפעולה."
+      currentGroupContainer.appendChild(msg);
+      pageDiv.appendChild(currentGroupContainer);
+    }
+
+    function populateProjectDropdown() {
+      document.getElementById('project-name-container').style.visibility = 'visible';
+      document.getElementById('project-dropdown').style.visibility = 'visible';
+      const projects = global_myProjects;
+      let projectSelect = document.getElementById('project-selection-dropdown');
+      projectSelect.innerHTML = ''; // Clear existing options
+      projects.forEach(function(project) {
+        let option = document.createElement('option');
+        option.value = project.id; // Assuming project object has an id property
+        option.textContent = project.name; // Assuming project object has a name property
+        projectSelect.appendChild(option);
+      });
+    }
+    function selectProjectInDropdown(selectElement) {
+      const disable = (selectElement.value == global_currentProject.id) // disable if same proj id
+      document.getElementById('change-project').disabled = disable;
+    }
+    function confirmProjectChange() {
+      // change and replace Questions
+      const dropdownElement = document.getElementById('project-selection-dropdown');
+      // in order to save answers
+      const prevProjectId = global_currentProject.id
+      global_currentProject = global_myProjects.find((proj) => proj.id == dropdownElement.value);
+      document.getElementById('change-project').disabled = true;
+      updateOfficeAndProject()
+
+      // first time again
+      global_pageFirstTime[pageNumberByName['DT']] = true
+      global_pageFirstTime[pageNumberByName['MS']] = true
+
+      // fetch questions again!
+      saveAndChangePage(pageNumberByName['DT'], prevProjectId)
+    }
+
+    function generateRandomId(length = 5) {
+      let result = '';
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      const charactersLength = characters.length;
+      for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+      return result;
+    }
+
+    const createInputTypeDropdown = (options, answer) => {
+      const inputElement = document.createElement('select');
+      let blankOption = document.createElement('option');
+      blankOption.value = ''; 
+      blankOption.textContent = 'בחר';
+      inputElement.appendChild(blankOption);
+      options.forEach(function(option) {
+        let optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.textContent = option;
+        if (option === answer) { 
+          optionElement.selected = true; 
+        }
+        inputElement.appendChild(optionElement);
+      });
+      return inputElement;
+    }
+    const createInputTypeNumber = (answer) => {
+      const inputElement = document.createElement('input');
+      if (answer) { inputElement.classList.add('input-gray-bg') }
+      inputElement.type = 'number';
+      inputElement.value = answer;
+      return inputElement;
+    }
+    const createInputTypeDate = (answer) => { 
+      const inputElement = document.createElement('input');
+      inputElement.type = 'date';
+      if (answer) {
+        inputElement.classList.add('input-gray-bg')
+        let date = new Date(answer);
+        date.setDate(date.getDate() + 1); //idk why i need to add 1 to the day. but it works this way
+        answer = date.toISOString().split('T')[0];
+      }
+      inputElement.value = answer;
+      return inputElement;
+    }
+    const createInputTypeYes_No = (answer, ques_name) => {
+      const yes_no_values = ['כן', 'לא'];
+      const radioContainer = document.createElement('div');
+      radioContainer.style = "display: flex; flex-direction: column;"
+      let radio;
+      yes_no_values.forEach(val => {
+        radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = ques_name;
+        radio.value = val;
+        if (answer === val) {
+          radio.checked = true;
+        }
+        const label = document.createElement('label');
+        const span = document.createElement('span');
+        span.textContent = val;
+        label.appendChild(radio);
+        label.appendChild(span);
+        radioContainer.appendChild(label);
+      })
+      if (!answer) { // default no
+        const radios = radioContainer.querySelectorAll('input[type="radio"]');
+        radios[radios.length-1].checked = true;
+      }
+      return radioContainer;
+    }
+    const createInputTypeText = (answer) => {
+      const inputElement = document.createElement('input');
+      if (answer) { inputElement.classList.add('input-gray-bg') }
+      inputElement.type = 'text';
+      inputElement.value = answer || "";
+      return inputElement;
+    }
+    const createInputTypeTextArea = (answer) => {
+      const inputElement = document.createElement('textarea');
+      if (answer) { inputElement.classList.add('input-gray-bg') }
+      inputElement.value = answer;
+      return inputElement;
+    }
+    
+    const createInputTypeCheckboxMultiChoice = (options, answer, max_choice) => {
+      const inputElement = document.createElement('div');
+      inputElement.classList.add('multi-checkbox-div')
+
+      options.forEach((option) => {
+        const label = document.createElement('label');
+        
+        const checkbox = document.createElement('input')
+        checkbox.type = 'checkbox';
+        checkbox.value = option;
+        checkbox.checked = answer && answer.split('$').includes(option.toString());
+        if (max_choice) { // some questions have no limit
+          checkbox.addEventListener('change', () => {
+            const checkedCheckboxes = inputElement.querySelectorAll('input[type="checkbox"]:checked');
+            if (checkedCheckboxes.length > max_choice) {
+              checkbox.checked = false;
+            }
+          });
+        }
+        
+        label.appendChild(checkbox);
+        const span = document.createElement('span');
+        span.textContent = option;
+        label.appendChild(span);
+        inputElement.appendChild(label);
+      });
+      return inputElement;
+    }
+
+    function generatePreInputText(questionObj) {
+      const textContainer = document.createElement('div');
+      textContainer.classList.add('question-text')
+      const q_desc = document.createElement('span');
+      q_desc.innerHTML = questionObj.question;
+      q_desc.classList.add('question-desc');
+      textContainer.appendChild(q_desc);
+      if (questionObj.required) {
+        const requiredStar = document.createElement('span');
+        requiredStar.textContent = '*';
+        requiredStar.classList.add('required-star');
+        textContainer.appendChild(requiredStar);
+      }
+
+      if (questionObj.info) {
+        let tooltip = document.createElement('span');
+        tooltip.classList.add('info-icon');
+        tooltip.classList.add('tooltip');
+        tooltip.innerHTML = '&#9432;';
+        let infoText = document.createElement('span');
+        infoText.classList.add('tooltiptext');
+        infoText.innerHTML = questionObj.info;
+        tooltip.appendChild(infoText);
+        textContainer.appendChild(tooltip);
+      }
+      // all text with addings
+      return textContainer;
+    }
+    function generateOnlyInputByType(questionObj) {
+      const funcs = {
+        'dropdown': () => createInputTypeDropdown(questionObj.options, questionObj.answer),
+        'Yes_No': () => createInputTypeYes_No(questionObj.answer, questionObj.ques_name),
+        'Number': () => createInputTypeNumber(questionObj.answer),
+        'Date': () => createInputTypeDate(questionObj.answer),
+        'Checkbox_Multi_Choice': () => createInputTypeCheckboxMultiChoice(questionObj.options, questionObj.answer, questionObj.max_choice),
+        'Text': () => createInputTypeText(questionObj.answer),
+        'Textarea': () => createInputTypeTextArea(questionObj.answer),
+      }
+      const inputFunc = funcs[questionObj.type];
+      const inputElement = inputFunc ? inputFunc() : funcs['Text']() // not suppose to get to Default
+      return inputElement;
+    }
+
+    function generateFullInput(questionObj) {
+      let questionElement = document.createElement('div');
+      questionElement.classList.add('single-question-container')
+      if (questionObj.ques_number) {
+        questionElement.id = `${questionObj.ques_number}`
+      }
+      if (questionObj.ans_next_to_ques) {
+        questionElement.classList.add('single-question-flex')
+      }
+      const textContainer = generatePreInputText(questionObj);
+      questionElement.appendChild(textContainer);
+      
+      const inputElement = generateOnlyInputByType(questionObj)
+
+      if (questionObj.required) { inputElement.required = true; }
+      if (inputElement.localName === 'div') { // Checkbox_Multi_Choice questions
+        inputElement.id = questionObj.ques_name;
+      } else { // all other
+        inputElement.name = questionObj.ques_name;
+      }
+      questionElement.appendChild(inputElement);
+      return questionElement;
+    }
+
+    function renderRolesSection(questionData, sectionData) {
+      return; // page5 disabled
+      const tableQuestions = questionData.filter(q => (q.position == 'Table'))
+      const loader = document.getElementById('insert-roles-section-here') // change later when adding real loader
+      const groupContainer = loader.parentElement;
+
+      const table = document.createElement('table');
+      table.classList.add('question-table');
+      table.id = 'roles-table';
+
+      const colWidths = [25, 25, 25, 25] // hard coded
+      const colgroup = document.createElement('colgroup');
+      for (let i=0; i < colWidths.length; i++) {
+        const col = document.createElement('col');
+        col.style.width = colWidths[i] + '%';
+        colgroup.appendChild(col)
+      }
+      table.appendChild(colgroup)
+
+      // Column headers
+      let headerRow = document.createElement('tr');
+      headerRow.id = 'roles-headers';
+
+      const headersList = [...tableQuestions];
+      headersList.unshift({question: "שם התפקיד", ques_name: 'role_name', type: "Fixed"}); // first
+      headersList.push({question: "פירוט הכשרות", ques_name: 'open_popup', type: "Fixed"}); // last
+
+
+      headersList.forEach(questionObj => {
+        const headerCell = document.createElement('th');
+        headerCell.textContent = questionObj.question;
+        headerRow.appendChild(headerCell);
+      });
+      table.appendChild(headerRow);
+
+      sectionData.allRoles.forEach((role) => {
+        const row = document.createElement('tr');
+          row.id = `role-${role.id}`;
+          row.key = role.id;
+            // loop through each question and create cells
+            headersList.forEach(questionObj => {
+              const cell = document.createElement('td');
+              let inputElement;
+              if (questionObj.type == 'Fixed') {
+                if (questionObj.ques_name == 'role_name') {
+                  inputElement = document.createElement('h2')
+                  inputElement.textContent = role.name
+                } else if (questionObj.ques_name == 'open_popup') {
+                  inputElement = createOpenTrainingsPopupCell(questionObj)
+                }
+              } else {
+                let curr_ans;
+                if (sectionData.depRolesData[role.id]) {
+                  curr_ans = sectionData.depRolesData[role.id][questionObj.ques_name];
+                }
+                questionObj.answer = curr_ans;
+                inputElement = generateOnlyInputByType(questionObj)
+                inputElement.name = questionObj.ques_name + '_' + role.id;
+              }
+              cell.appendChild(inputElement);
+              row.appendChild(cell);
+            });
+            table.appendChild(row);
+      })
+      groupContainer.appendChild(table)
+    }
+    
+    function populateQuestionsMSPage(questionData, all_milestones_options, milestones, milestones_ans, pageNumber) {
+      document.getElementById('loader-container').style.display = 'none';
+      const questionsDiv = document.getElementById(`page${pageNumber}`);
+      questionsDiv.classList.add('group-container')
+      questionsDiv.style.display = 'block';
+      questionsDiv.innerHTML = ''; // Clear existing content
+
+      const pageTitle = document.createElement('h2');
+      pageTitle.innerHTML = 'רשימת אבני הדרך בפרוייקט מסוג ' + global_currentProject.typeName
+      questionsDiv.appendChild(pageTitle)
+
+      let table = document.createElement('table');
+      table.classList.add('question-table');
+      table.id = 'miles-table';
+
+      const colWidths = [20, 20, 5, 5, 7, 7, 20, 6, 10] // hard coded
+      const colgroup = document.createElement('colgroup');
+      for (let i=0; i < 9; i++) {
+        const col = document.createElement('col');
+        col.style.width = colWidths[i] + '%';
+        colgroup.appendChild(col)
+      }
+      table.appendChild(colgroup)
+
+      // Column headers
+      let headerRow = document.createElement('tr');
+      headerRow.id = 'header-row';
+      let nameHeader = document.createElement('th');
+      nameHeader.textContent = 'אבן דרך';
+      headerRow.appendChild(nameHeader);
+      questionData.forEach(function (questionObj) {
+        let headerCell = document.createElement('th');
+        headerCell.textContent = questionObj.question;
+        headerRow.appendChild(headerCell);
+      });
+      table.appendChild(headerRow);
+      // Loop through each milestone and create a row
+      for (let ml_stone_id in milestones) {
+          // Take all milestones created that fit this milestone title.
+          let curr_miles_stones = {};
+          for (let ml_full_id in milestones_ans) {
+              if (ml_full_id.startsWith(ml_stone_id + '_')) {
+                  curr_miles_stones[ml_full_id] = milestones_ans[ml_full_id];
+              }
+          }
+          if (Object.keys(curr_miles_stones).length === 0) {
+            const ms_unique_id = generateRandomId(5);
+            curr_miles_stones[ml_stone_id + '_' + ms_unique_id] = {
+                'MS_Name': '',
+                'MS_Start_Date': '',
+                'MS_End_Date': '',
+                'MS_Status': '',
+                'MS_Buying_Required': '',
+                'MS_Product_Desc': '',
+                'MS_Product_Done': ''
+            };
+          }
+          for (let ml_full_id in curr_miles_stones) {
+            const row = createMileStoneRow(questionData, all_milestones_options, ml_full_id, curr_miles_stones[ml_full_id])
+            table.appendChild(row)
+          }
+        }
+      questionsDiv.appendChild(table);
+      finishLoad();
+    }
+    function createOpenTrainingsPopupCell() {
+      const container = document.createElement('div');
+      container.style.margin = "auto"
+      const openBtn = document.createElement('button');
+      openBtn.innerHTML = '<i class="fa fa-solid fa-plus"></i>';
+      container.appendChild(openBtn);
+      return container;
+    }
+    // "delete" and "+" on same cell
+    function createMileStoneButtonsCell(questionData, milestones) {
+      let btnsCell = document.createElement('td');
+      let btnsDiv = document.createElement('div');
+      btnsDiv.classList.add('btns-cell');
+      // Add "Delete" button for every row
+      let deleteButton = document.createElement('button');
+      deleteButton.innerHTML = '<i class="fa fa-trash-o"></i>';
+      deleteButton.onclick = function () {
+        let rowId = this.closest('tr').id;
+        let idParts = rowId.split('_'); 
+        let id_ml_stone = idParts[0]; 
+        if (milestones[id_ml_stone] && milestones[id_ml_stone].required) {
+          // Check if there is at least another row with the same id_ml_stone before the underscore
+          let otherRowsExist = Array.from(document.querySelectorAll('tr[id^="' + id_ml_stone + '_"]')).some(function (tr) {
+            return tr.id !== rowId; // Check if the row ID is not the same as the current row's ID
+          });
+          if (!otherRowsExist) {
+            alert("אבן דרך זו היא חובה.");
+            return; 
+          }
+        }
+        this.closest('tr').remove();
+      };
+      // Add 'add' button for every row
+      let addButton = document.createElement('button');
+      addButton.innerHTML = '<i class="fa fa-solid fa-plus"></i>';
+      addButton.onclick = function (event) {
+        addMileStone(questionData, milestones, event.target.closest('tr'));
+      }
+      btnsDiv.appendChild(deleteButton);
+      btnsDiv.appendChild(addButton);
+      btnsCell.appendChild(btnsDiv);
+      return btnsCell;
+    }
+
+    function addMileStone(questionData, milestones, rowClicked) {
+      const row = createMileStoneRow(questionData, milestones, null, null);
+      const table = rowClicked.parentElement;
+      table.insertBefore(row, rowClicked.nextSibling);
+    }
+
+    // both ml_full_id and answers is to understand if new
+    function createMileStoneRow(questionData, milestones, ml_full_id, answers) {
+      const row = document.createElement('tr');
+      const nameCell = document.createElement('td');
+      let ml_stone_id, ml_unique_id;
+      const textContainer = document.createElement('div');
+      if (answers) {
+        row.id = ml_full_id;
+        ml_stone_id = ml_full_id.split('_')[0]
+        ml_unique_id = ml_full_id.split('_')[1]
+        const mlTitle = document.createElement('span');
+        mlTitle.textContent = milestones[ml_stone_id].ml_title; // Name of the milestone
+        textContainer.appendChild(mlTitle);
+        if (milestones[ml_stone_id].required) {
+          const requiredStar = document.createElement('span');
+          requiredStar.textContent = '*';
+          requiredStar.classList.add('required-star');
+          textContainer.appendChild(requiredStar);
+        }
+        nameCell.appendChild(textContainer);
+      } else {
+        let dropdown = document.createElement('select');
+
+        for (let stone_id in milestones) {
+          let option = document.createElement('option');
+          const unique_id = generateRandomId(5);
+          ml_full_id = stone_id + '_' + unique_id;
+          option.value = ml_full_id;
+          option.textContent = milestones[stone_id].ml_title;
+          dropdown.appendChild(option);
+        }
+        dropdown.onchange = (opt) => {
+          const value = opt.target.value;
+          row.id = value;
+        }
+        nameCell.appendChild(dropdown);
+      }
+      row.appendChild(nameCell);
+      // loop through each question and create cells
+      questionData.forEach(function (questionObj) {
+        const cell = document.createElement('td');
+        // create appropriate input elements based on question type
+        let question_unique_name = questionObj.ques_name;
+        questionObj['answer'] =  answers ? answers[question_unique_name] : "";
+        const inputElement = generateOnlyInputByType(questionObj);
+        inputElement.name = question_unique_name + '_' + ml_full_id;
+        cell.appendChild(inputElement);
+        row.appendChild(cell);
+      });
+      const btnsCell = createMileStoneButtonsCell(questionData, milestones)
+      row.appendChild(btnsCell);
+      return row;
+    }
+
+    const groupQuestionsByTitle = (questionData) => {
+      return questionData.reduce((grouped, obj) => {
+          const { title, ...rest } = obj;
+          const index = grouped.findIndex(item => item[0].title === title);
+          if (index === -1) { grouped.push([{ title, ...rest }]) }
+          else { grouped[index].push({ title, ...rest }) }
+          return grouped;
+      }, []);
+    }
+    const groupQuestionsByPosition = (questionData) => {
+      // Create an object to hold arrays of objects grouped by position
+      const grouped = questionData.reduce((grouped, ques) => {
+        // Check if the position exists in the accumulator, if not, initialize it with an empty array
+        if (!grouped[ques.position]) {
+          grouped[ques.position] = [];
+        }
+        // Push the current object to the corresponding position array
+        grouped[ques.position].push(ques);
+        return grouped;
+      }, {});
+
+      // Define the order of types
+      const order = ['Pre', 'Post'];
+
+      const ghostGroup = [{
+        emptyGroup: true,
+        title: 'איוש תפקידים - ענן נימבוס',
+      }]
+      // Map over the order and return arrays of objects for each type, filtering out undefined types
+      const sections = order.map(pos => grouped[pos]).filter(Boolean);
+      sections.splice(1, 0, ghostGroup); // the empty section
+      return sections;
+    }
+    const createLoader = () => {
+      const elem = document.createElement('p');
+      elem.id = "insert-roles-section-here";
+      elem.innerHTML = "<h2>אנחנו טוענים את השאלות...</h2>";
+      return elem;
+    }
+
+    // for all but ms page
+    function populateQuestions(questionData, pageNum) {
+      document.getElementById('loader-container').style.display = 'none';
+      const questionsDiv = document.getElementById(`page${pageNum}`);
+      questionsDiv.style.display = 'block';
+      questionsDiv.innerHTML = ''; // clear existing content
+      let currentGroup = ''; 
+      const currentGroupContainer = document.createElement('div'); 
+      // Grouping the questions by title
+      let questionsGrouped = (pageNum === pageNumberByName['Training']) ? groupQuestionsByPosition(questionData) : groupQuestionsByTitle(questionData);
+
+      if (pageNum === pageNumberByName['Training']) { questionsGrouped = [] } // page Training disabled
+      questionsGrouped.forEach((group) => {
+        if (!group.length) {return}
+        const groupContainer = document.createElement('div'); 
+        groupContainer.classList.add('group-container')
+
+        if (group[0].title == "תכנון הפרוייקט") {
+          groupContainer.style.position = "relative"
+          const img = createImagePlanning();
+          groupContainer.appendChild(img);
+        }
+
+        const titleElement = document.createElement('h2');
+        titleElement.textContent = group[0].title;
+        groupContainer.appendChild(titleElement);
+        currentGroup = group[0].title;
+        if (group[0].subTitle) {
+            let subtitleElement = document.createElement('p');
+            subtitleElement.innerHTML = group[0].subTitle;
+            groupContainer.appendChild(subtitleElement);
+        }
+
+        // questions
+        group.forEach((questionObj) => {
+          let questionElement;
+          if (questionObj.emptyGroup) { // mikta 2 in page Training
+            questionElement = createLoader();
+          } else { // regular
+            questionElement = generateFullInput(questionObj);
+          }
+          groupContainer.appendChild(questionElement);
+        });
+        questionsDiv.appendChild(groupContainer);
+      })
+      finishLoad();
+    }
+
+    function createImagePlanning() {
+      let img = document.createElement('img');
+      img.id = 'plan-image'
+      img.src = 'https://storageaccountpbiema3c5.blob.core.windows.net/icons/Project_Cloud_Journey.png'; 
+      return img
+    }
+    function createImageLogo() {
+      let img = document.createElement('img');
+      img.id = 'logo'
+      img.src = 'https://www.gov.il/BlobFolder/office/improving-government-service-unit/en/Israel National Digital Agency_Logo.png'; 
+      return img
+    }
+
+    // btnClickd: 'next' or 'prev'
+    function getCorrectedNextPage(btnClickd) {
+      // if not funded- no page MS!
+      let newPage = (btnClickd == 'next') ? global_currentPage + 1 : global_currentPage - 1;
+      if (!global_currentProject.isFunded && newPage == pageNumberByName['MS']) {
+        newPage = (btnClickd == 'next') ? newPage + 1 : newPage - 1;
+      }
+      return newPage;
+    }
+
+    function nextPage() {
+      const newPage = getCorrectedNextPage('next'); // if num6 its for finish!
+      saveAndChangePage(newPage, null);
+    }
+
+    function prevPage() {
+      const newPage = getCorrectedNextPage('prev');
+      if (newPage >= 1) {
+        saveAndChangePage(newPage, null);
+      }
+    }
+
+    function saveSingleInput(input, page) {
+      const answers = {}
+
+      if (page == pageNumberByName['MS']) {// mabey implement it better later
+        const trElements = document.querySelectorAll('#page' + page + ' tr'); 
+        trElements.forEach(function(tr) {
+          if (tr.id !== 'header-row'){
+            const rowAnswers = []; // for storing answers for this row
+            const rowInputs = tr.querySelectorAll('input, select, textarea'); 
+            rowInputs.forEach(function(rowInput) {
+              rowAnswers.push(rowInput.value); 
+            });
+            if (rowAnswers.length == 8){// its usually 7. so it means this row was created by clicking 'Add'. change this to better implementation
+              rowAnswers.shift();
+            }
+            answers[tr.id] = rowAnswers; // store row answers with row ID as key
+          }
+        });
+        return answers
+      }
+      // pages no MS
+      if (input.type == 'radio') {
+        if (input.checked) { answers[input.name] = input.value.trim() }
+      }
+      const simpleTypes = ['select-one', 'text', 'number', 'date']
+      if (simpleTypes.includes(input.type)) {
+        answers[input.name] = input.value.trim();
+
+        if (input.required && !answers[input.name]) {
+          const wrapDiv = input.closest(".single-question-container");
+          global_missing_required[page].push(wrapDiv['id'])
+        }
+      }
+      if (input.classList.contains("multi-checkbox-div")) { // multi
+        const checked = input.querySelectorAll('input[type="checkbox"]:checked');
+        const selectedOptions = Array.from(checked).map(c => c.value);;
+        answers[input.id] = selectedOptions.join('$'); // Save selected options separated by $
+      }
+      return answers
+    }
+
+    function savePageAnswers(pageNum, prevProjectId, finish) {
+      global_missing_required[pageNum] = []
+      let answers = {};
+      // exclude multi-option, because it has a div wrapper (.multi-checkbox-div)
+      const inputElements = document.querySelectorAll(
+        `#page${pageNum} input:not([type="checkbox"]), #page${pageNum} select, #page${pageNum} .multi-checkbox-div`
+      );
+      inputElements.forEach((input) => {
+        const ansObj = saveSingleInput(input, pageNum)
+        answers = { ...ansObj, ...answers }
+      });
+      let errorMessage = "";
+      if (finish) {
+        errorMessage = "שים לב, לא ענית על מספר שאלות חובה בשאלון:\n";
+        errorMessage += "לא ניתן לשמור ולצאת מהשאלון.";
+        let allGood = true;
+        for (let j=1; j<=5; j++) {
+          if (!global_missing_required[j].length) { continue }
+          errorMessage += '\n' + `בעמוד ${j}, שאלות: `
+          errorMessage += global_missing_required[j].join(', ');
+          allGood = false;
+        }
+        if (!allGood) {
+          alert(errorMessage);
+          return false;
+        }
+      } else { // not finish
+        if (global_missing_required[pageNum].length > 0) {
+          errorMessage = "שים לב, לא ענית על מספר שאלות חובה בעמוד זה: \n";
+          errorMessage += global_missing_required[pageNum].join(', ');
+          alert(errorMessage);
+        }
+      }
+      // if (prevProjectId) use it
+      const projectId = prevProjectId || global_currentProject.id;
+      google.script.run.saveNewAnswers(pageNum, answers, projectId, global_myDep.id);
+      return true
+    }
+
+    function putTooltips() {
+      Object.values(global_pagesData).forEach(p => {
+        const btn = document.getElementById('top-menu-page' + p.number);
+        let tooltip = document.createElement('span');
+        tooltip.classList.add('tooltiptext');
+        tooltip.innerHTML = p.title;
+        btn.appendChild(tooltip);
+      })
+    }
+    function fillGeneralData() {
+      updateOfficeAndProject()
+      populateProjectDropdown()
+      putTooltips()
+    }
+
+    function updatePagesOrder(pagesData) {
+      const pagesNewOrder = {}
+      for (const [page, data] of Object.entries(pagesData)) {
+        pagesNewOrder[data.prefix] = Number(page);
+      }
+      pageNumberByName = pagesNewOrder;
+    }
+    function updateGlobalState({ myUser, myDep, myProjects, pagesData }) {
+      global_myUser = myUser;
+      global_myDep = myDep;
+      global_myProjects = myProjects;
+      global_currentProject = global_myProjects[0];
+      global_pagesData = pagesData;
+      updatePagesOrder(pagesData);
+    }
+
+    function onStart() {
+      google.script.run.withSuccessHandler((generalData) => {
+        updateGlobalState(generalData)
+        fillGeneralData()
+        
+        const populatePage1 = (questionData) => { populatePage(1, questionData) }
+        google.script.run.withSuccessHandler(populatePage1).getQuestionsForUser(global_myDep.id, global_currentProject.id, 1);
+
+      }).getUserRelevantData();
+    }
+    onStart()
+  </script>
+</body>
+</html>

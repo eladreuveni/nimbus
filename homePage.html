@@ -14,7 +14,9 @@
         --active-button-hover-color: #0066d4;
         --active-button-click-color: #0047d4;
         --disabled-button-color: #b6c0cc;
-        --input-filled-bg: #ECECEC;
+        --input-filled-bg: #FAFAFA;
+        --active-button-green: #4CAF50;
+        --active-button-hover-green: #388E3C ;
       }
       html, body {
         font-family: Calibri;
@@ -22,7 +24,7 @@
         margin: 0;
         padding: 0;
         background-color: var(--page-bg-color);
-        direction: rtl; 
+        direction: rtl;
       }
       h1 {
         font-size: 1.5rem;
@@ -38,39 +40,39 @@
         margin-right: 5px; /* Adjust spacing between the question text and the icon */
       }
 
-      .info-icon .tooltiptext {
+      .tooltiptext {
+        position: absolute;
+        font-family: Calibri;
         visibility: hidden;
-        width: 160px;
         background-color: #555;
         color: #fff;
         text-align: center;
         border-radius: 6px;
         padding: 5px;
-        position: absolute;
-        z-index: 1;
-        top: 100%;
-        left: 50%;
-        margin-left: -80px;
         opacity: 0;
         transition: opacity 0.3s;
+        z-index: 1;
+      }
+      .info-icon .tooltiptext {
+        top: 100%;
+        left: 50%;
+        width: 160px;
+        margin-left: -80px;
       }
 
       .number-button .tooltiptext {
-        visibility: hidden;
+        font-size: 1rem;
         width: max-content;
-        background-color: #555;
-        color: #fff;
-        text-align: center;
-        border-radius: 6px;
-        padding: 5px;
-        position: absolute;
-        z-index: 1;
         top: 110%;
         left: 50%;
         transform: translate(-50%);
-        opacity: 0;
-        transition: opacity 0.3s;
-        font-size: 1rem;
+      }
+
+      .expand-btn .tooltiptext {
+        width: max-content;
+        top: 110%;
+        left: 50%;
+        transform: translate(-50%);
       }
 
       .tooltip:hover .tooltiptext {
@@ -90,8 +92,7 @@
       #page2,
       #page3,
       #page4,
-      #page5,
-      #page-thank-you {
+      #page5 {
         margin: 0 auto;
         width: 90%;
         display: none; /* Hide all pages initially */
@@ -118,8 +119,9 @@
         display: flex;
         align-items: center;
       }
-      .single-question-flex div {
+      .single-question-container.single-question-flex div {
         margin-left: 20px;
+        margin-bottom: 0px;
       }
 
       #change-project:disabled {
@@ -304,10 +306,6 @@
         text-align: center;
         position: relative;
       }
-      .titles-container {
-        text-align: center;
-        position: relative;
-      }
       .number-button {
         display: inline-block;
         font-family: Comic Sans MS;
@@ -319,14 +317,7 @@
         margin: 15px;
         cursor: pointer;
         position: relative; /* Make sure buttons have a stacking context */
-        z-index: 2; /* Ensure buttons are above the line */
-      }
-      .titles-container h5 {
-        display: inline-block;
-        font-family: Comic Sans MS;
-        color: black;
-        text-align: center;
-        font-size: 1.25rem;
+        z-index: 1; /* Ensure buttons are above the line */
       }
 
       .number-button:disabled {
@@ -349,7 +340,7 @@
         top: 50%; /* Position the line at the vertical center of the button container */
         left: 25px; /* Adjust left position to center the line between buttons */
         transform: translateY(-50%);
-        z-index: 1; /* Ensure line is behind the buttons */
+        z-index: 0; /* Ensure line is behind the buttons */
       }
       .add-button-row{
         display: inline-block;
@@ -464,6 +455,12 @@
         gap: 40px;
         justify-content: center;
       }
+      .prev-next-btns .quit-btn {
+        background-color: var(--active-button-green);
+      }
+      .prev-next-btns .quit-btn:hover:enabled {
+        background-color: var(--active-button-hover-green);
+      }
 
       .btns-cell {
         display: flex;
@@ -497,6 +494,123 @@
         text-wrap: wrap;
         line-height: 2rem;
       }
+      .trainings-page-table input[type="number"] {
+        width: 80%;
+      }
+      .role-table td h3 {
+        margin: 1rem 0;
+      }
+      #role-popup {
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      #role-popup.show {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #role-popup.hide {
+        display: none;
+      }
+
+      #role-popup .popup-content {
+        background-color: #fff;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%;
+        max-height: 75%;
+        border-radius: 8px;
+        position: relative;
+        overflow-y: scroll;
+      }
+      .training-table td h3 {
+        font-size: 1rem;
+        margin: 0;
+      }
+      .training-table tr th:first-child {
+        width: 70%;
+      }
+
+      .trainings-page-table .roles-table-name-cell {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .trainings-page-table .info-icon .tooltiptext {
+        width: 500px;
+        margin-left: -250px;
+      }
+
+      #role-popup .close-btn {
+        font-size: 3rem;
+        cursor: pointer;
+      }
+
+      .single-role-popup-data .sug-training {
+        margin-bottom: 1rem;
+      }
+      .single-role-popup-data .sug-training .training-path-name-span {
+        font-weight: bold;
+      }
+      #role-popup .popup-top-row {
+        display: flex;
+        align-items: center;
+      }
+      #role-popup .popup-top-row div {
+        flex: 1;
+      }
+      #role-popup .popup-top-row h2 {
+        text-align: center;
+        flex: 5;
+        margin: 0;
+      }
+      #role-popup .popup-top-row .flex-item button {
+        margin-right: auto;
+      }
+      #role-popup tr.hide-row {
+        display: none;
+      }
+      #role-popup .cloud-data {
+        font-size: 1.2rem;
+        margin: 0.5rem 0 2rem 0;
+      }
+      #role-popup .cloud-data .cloud-label {
+        margin-left: 0.5rem;
+      }
+      #role-popup .training-journey-container {
+        margin-bottom: 5rem;
+      }
+      #role-popup .training-journey-container h3 {
+        text-align: center;
+      }
+      .expand-btn {
+        margin: auto;
+        padding: 5px;
+        display: flex;
+        position: relative;
+      }
+      .expand-btn .expand-icon {
+        width: 1.5rem;
+      }
+      .expand-btn:disabled {
+        background-color: var(--disabled-button-color);
+        cursor: default;
+      }
+      #page-thank-you {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   </head>
@@ -530,14 +644,6 @@
     <div class="line"></div>
   </div>
 
-  <!-- someday --!>
-  <!-- <div class="titles-container">
-      <h5>בקרת פרוייקטים</h5>
-      <h5>אבני דרך פרוייקטליים</h5>
-      <h5>כשירות המשרד למעבר לענן</h5>
-      <h5>חסמי המשרד במעבר לענן</h5>
-  </div> -->
-
   <div id="loader-container" style="display: block;">
     <div class="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
   </div>
@@ -567,13 +673,13 @@
     <!-- Questions for Page 5 -->
   </div>
 
-  <div id="page-thank-you" class="page-container" style="display: none;">
   </div>
 
   <div id="bottom-buttons-container" class="prev-next-btns" style="display: none;">
     <div class="prev-next-btns-flex">
-      <button id="prev-btn-bottom" class="nav-btn prev-btn" onclick="prevPage()"></button>
-      <button id="next-btn-bottom" class="nav-btn next-btn" onclick="nextPage()"></button>
+      <button class="prev-btn" onclick="prevPage()"></button>
+      <button class="next-btn" onclick="nextPage()"></button>
+      <button class="quit-btn" onclick="saveAndQuit()">שמור וצא</button>
     </div>
   </div>
 
@@ -606,13 +712,14 @@
     function saveAndChangePage(nextPage, prevProjectId) {
       nextPage = Number(nextPage)
       // save
-      const finish = (nextPage == 6)
+      const finish = (nextPage == 6);
       const saved = savePageAnswers(global_currentPage, prevProjectId, finish)
       if (!saved) { return }
 
-      if (nextPage == 6) {
-        populateThankYouPage()
-        return;
+      if (finish) {
+        const res = confirm("התשובות ישמרו ותתצבע התנתקות מיידית.");
+        if (res) { populateThankYouPage(); }
+        return; // no change page
       }
 
       global_currentPage = nextPage;
@@ -633,22 +740,21 @@
 
     function handleButtonsDisplay() {
       document.querySelectorAll('.prev-next-btns').forEach((container)=> {
-        container.style.display = "block"
-      })
-      const prevVisibility = (global_currentPage == 1) ? 'hidden' : 'visible';
-      const prevText = 'שמור וחזור';
-      
-      const nextVisibility = 'visible';
-      const nextText = (global_currentPage == 5) ? 'שמור וצא' : 'שמור והמשך';
+        container.style.display = "block";
 
-      document.querySelectorAll('.prev-btn').forEach((btn) => {
-        btn.style.visibility = prevVisibility;
-        btn.textContent = prevText;
+        container.querySelectorAll('.prev-btn').forEach((btn) => {
+          btn.style.visibility = (global_currentPage == 1) ? 'hidden' : 'visible';
+          btn.textContent = 'שמור וחזור';
+        })
+        container.querySelectorAll('.next-btn').forEach((btn) => {
+          btn.style.visibility = 'visible';
+          btn.textContent = (global_currentPage == 5) ? 'שמור' : 'שמור והמשך';
+        })
+        container.querySelectorAll('.quit-btn').forEach((btn) => {
+          btn.style.display = (global_currentPage == 5) ? 'block' : 'none';
+        })
       })
-      document.querySelectorAll('.next-btn').forEach((btn) => {
-        btn.style.visibility = nextVisibility;
-        btn.textContent = nextText;
-      })
+      
     }
 
     function highlightPageNumberButton(buttonsDisabled) {
@@ -666,14 +772,25 @@
       document.getElementById('page-intro').style.display = "none"
     }
     function specificRestrictions() {
-      // in pages 3,4,5 not possible to reSelect, also if same proj
+      // in pages 1,2,5 not possible to reSelect, also if same proj
       const depPages = [pageNumberByName['Readiness'], pageNumberByName['Barrier'], pageNumberByName['Training']]
       const isDepPage = (depPages.includes(global_currentPage))
-      const dropdown = document.getElementById('project-selection-dropdown');
-      const sameProj = (dropdown.value == global_currentProject.id)
 
-      dropdown.disabled = isDepPage; // dd
-      document.getElementById('change-project').disabled = isDepPage || sameProj; // btn
+      const projNameContainer = document.getElementById('project-name-container');
+      const projDDContainer = document.getElementById('project-dropdown');
+      if (isDepPage) {
+        projNameContainer.style.visibility = 'hidden';
+        projDDContainer.style.visibility = 'hidden';
+      }
+      else { // project page
+        projNameContainer.style.visibility = 'visible';
+        projDDContainer.style.visibility = 'visible';
+
+        const dropdown = document.getElementById('project-selection-dropdown');
+        const sameProj = (dropdown.value == global_currentProject.id)
+        document.getElementById('change-project').disabled = sameProj; // btn
+      }
+      
 
       // only funded projects have MS Page
       const msPageNum = pageNumberByName['MS'];
@@ -693,10 +810,17 @@
         container.style.display = "none"
       })
     }
+    function hideProjectDDandName() {
+      const projNameContainer = document.getElementById('project-name-container');
+      const projDDContainer = document.getElementById('project-dropdown');
+      projNameContainer.style.visibility = 'hidden';
+      projDDContainer.style.visibility = 'hidden';
+    }
     function startLoad() {
       highlightPageNumberButton(true); // true for disable
       hideAllPages();
       hideNavBtns();
+      hideProjectDDandName();
       document.getElementById('loader-container').style.display = 'block';
     }
 
@@ -749,26 +873,22 @@
     }
 
     function populateThankYouPage() {
-      const allPages = document.querySelectorAll('.page-container')
-      allPages.forEach(p => { p.style.display = 'none' })
-      hideNavBtns();
-      document.getElementById('loader-container').style.display = 'none';
-      document.getElementById('page-intro').style.display = 'none';
+      document.body.innerHTML = "";      
 
-      const pageDiv = document.getElementById("page-thank-you");
-      pageDiv.style.display = 'block';
-      pageDiv.innerHTML = '';
-      const currentGroupContainer = document.createElement('div');
-      currentGroupContainer.classList.add('group-container');
-      const msg = document.createElement('h2');
-      msg.innerHTML = "השאלון הסתיים." + "<br>" + "תודה רבה על שיתוף הפעולה."
-      currentGroupContainer.appendChild(msg);
-      pageDiv.appendChild(currentGroupContainer);
+      const container = document.createElement("div");
+      container.id = "page-thank-you";
+      const msgWrap = document.createElement("div");
+      msgWrap.className = "group-container";
+
+      const msgH2 = document.createElement('h2');
+      msgH2.innerHTML = "השאלון הסתיים." + "<br>" + "תודה רבה על שיתוף הפעולה." + "<br>" + "ניתן לחזור בעתיד לשאלות שלא נענו."
+
+      msgWrap.appendChild(msgH2);
+      container.appendChild(msgWrap);
+      document.body.appendChild(container);
     }
 
     function populateProjectDropdown() {
-      document.getElementById('project-name-container').style.visibility = 'visible';
-      document.getElementById('project-dropdown').style.visibility = 'visible';
       const projects = global_myProjects;
       let projectSelect = document.getElementById('project-selection-dropdown');
       projectSelect.innerHTML = ''; // Clear existing options
@@ -915,6 +1035,24 @@
       return inputElement;
     }
 
+    function createRequiredStar() {
+      const requiredStar = document.createElement('span');
+      requiredStar.textContent = '*';
+      requiredStar.classList.add('required-star');
+      return requiredStar;
+    }
+    function createTooltip(info) {
+      const tooltip = document.createElement('span');
+      tooltip.classList.add('info-icon');
+      tooltip.classList.add('tooltip');
+      tooltip.innerHTML = '&#9432;';
+      const infoText = document.createElement('span');
+      infoText.classList.add('tooltiptext');
+      infoText.innerHTML = info;
+      tooltip.appendChild(infoText);
+      return tooltip;
+    }
+
     function generatePreInputText(questionObj) {
       const textContainer = document.createElement('div');
       textContainer.classList.add('question-text')
@@ -923,21 +1061,12 @@
       q_desc.classList.add('question-desc');
       textContainer.appendChild(q_desc);
       if (questionObj.required) {
-        const requiredStar = document.createElement('span');
-        requiredStar.textContent = '*';
-        requiredStar.classList.add('required-star');
+        const requiredStar = createRequiredStar()
         textContainer.appendChild(requiredStar);
       }
 
       if (questionObj.info) {
-        let tooltip = document.createElement('span');
-        tooltip.classList.add('info-icon');
-        tooltip.classList.add('tooltip');
-        tooltip.innerHTML = '&#9432;';
-        let infoText = document.createElement('span');
-        infoText.classList.add('tooltiptext');
-        infoText.innerHTML = questionObj.info;
-        tooltip.appendChild(infoText);
+        const tooltip = createTooltip(questionObj.info)
         textContainer.appendChild(tooltip);
       }
       // all text with addings
@@ -984,32 +1113,27 @@
     }
 
     function renderRolesSection(questionData, sectionData) {
-      const tableQuestions = questionData.filter(q => (q.position == 'Table'))
       const loader = document.getElementById('insert-roles-section-here') // change later when adding real loader
+      loader.innerHTML = "";
       const groupContainer = loader.parentElement;
 
-      const table = document.createElement('table');
-      table.classList.add('question-table');
-      table.id = 'roles-table';
-
-      const colWidths = [25, 25, 25, 25] // hard coded
-      const colgroup = document.createElement('colgroup');
-      for (let i=0; i < colWidths.length; i++) {
-        const col = document.createElement('col');
-        col.style.width = colWidths[i] + '%';
-        colgroup.appendChild(col)
-      }
-      table.appendChild(colgroup)
-
       // Column headers
-      let headerRow = document.createElement('tr');
-      headerRow.id = 'roles-headers';
-
+      const tableQuestions = questionData.filter(q => (q.position == 'Table'))
       const headersList = [...tableQuestions];
-      headersList.unshift({question: "שם התפקיד", ques_name: 'role_name', type: "Fixed"}); // first
+      headersList.unshift({question: "שם התפקיד", ques_name: 'row_title', type: "Fixed"}); // first
       headersList.push({question: "פירוט הכשרות", ques_name: 'open_popup', type: "Fixed"}); // last
 
+      const table = createTrainingPageGenericTable('role', headersList, sectionData.allRoles, sectionData.depRolesData, null)
 
+      groupContainer.appendChild(table)
+      generateTrainingPagePopupAndContent(questionData, sectionData)
+    }
+    function createTrainingPageGenericTable(title, headersList, allItems, dataObject, roleID) {
+      // table setters
+      const table = document.createElement('table');
+      table.classList.add('question-table', 'trainings-page-table', `${title}-table`);
+
+      const headerRow = document.createElement('tr');
       headersList.forEach(questionObj => {
         const headerCell = document.createElement('th');
         headerCell.textContent = questionObj.question;
@@ -1017,36 +1141,220 @@
       });
       table.appendChild(headerRow);
 
-      sectionData.allRoles.forEach((role) => {
+      allItems.forEach((item) => {
         const row = document.createElement('tr');
-          row.id = `role-${role.id}`;
-          row.key = role.id;
+          row.id = `${title}-${item.id}`;
+          if (item.cloudVendor) {
+            row.classList.add(`CLOUD-${item.cloudVendor.trim().toUpperCase()}`); // AWS GCP
+          }
+          row.key = item.id;
             // loop through each question and create cells
             headersList.forEach(questionObj => {
               const cell = document.createElement('td');
               let inputElement;
               if (questionObj.type == 'Fixed') {
-                if (questionObj.ques_name == 'role_name') {
-                  inputElement = document.createElement('h2')
-                  inputElement.textContent = role.name
+                if (questionObj.ques_name == 'row_title') {
+                  inputElement = document.createElement('div');
+                  inputElement.className = "roles-table-name-cell";
+                  h3 = document.createElement('h3');
+                  h3.textContent = item.name;
+                  inputElement.appendChild(h3)
+                  if (item.desc) {
+                    const tooltip = createTooltip(item.desc);
+                    inputElement.appendChild(tooltip)
+                  }
                 } else if (questionObj.ques_name == 'open_popup') {
-                  inputElement = createOpenTrainingsPopupCell(questionObj)
+                  inputElement = createOpenTrainingsPopupCell(item.id, row)
                 }
               } else {
                 let curr_ans;
-                if (sectionData.depRolesData[role.id]) {
-                  curr_ans = sectionData.depRolesData[role.id][questionObj.ques_name];
+                if (dataObject[item.id]) {
+                  curr_ans = dataObject[item.id][questionObj.ques_name];
                 }
                 questionObj.answer = curr_ans;
                 inputElement = generateOnlyInputByType(questionObj)
-                inputElement.name = questionObj.ques_name + '_' + role.id;
+                const inputName = roleID ? `${questionObj.ques_name},Role_ID=${roleID},Training_ID=${item.id}` : `${questionObj.ques_name},Role_ID=${item.id}`
+                inputElement.name = inputName;
+                inputElement.onchange = rolesTableInputChange
               }
               cell.appendChild(inputElement);
               row.appendChild(cell);
             });
             table.appendChild(row);
       })
-      groupContainer.appendChild(table)
+      return table;
+    }
+    function handleRoleOpenBtn(tr, openBtn) {
+      const hasValue = roleRowHasValue(tr); // disable if no value
+      openBtn.disabled = !hasValue;
+      openBtn.classList.toggle('tooltip', !hasValue); // add tooltip if no value
+    }
+    function rolesTableInputChange(e) {
+      const tr = e.target.closest('tr');
+      const openBtn = tr.querySelector('.expand-btn');
+      if (openBtn) {
+        handleRoleOpenBtn(tr, openBtn)
+      }
+    }
+    function roleRowHasValue(tr) {
+      const inputs = tr.querySelectorAll('input[type="number"]');
+      
+      for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value && inputs[i].value > 0) {
+          return true;
+        }
+      }
+      return false;
+    }
+    function displayRolePopup(open, roleID) {
+      const popup = document.getElementById('role-popup');
+      popup.className = open ? 'show' : 'hide';
+      if (open) {
+        const cloudQ = document.querySelector('select[name="Training_General_3"]');
+        let cloudVendor = cloudQ?.value?.toUpperCase() //! todo change if q number changes
+
+        cloudVendor = (cloudVendor == 'AWS' || cloudVendor == 'GCP') ? cloudVendor : 'AWS+GCP';
+
+        const cloudRows = document.querySelectorAll(`#role-popup tr.CLOUD-AWS, #role-popup tr.CLOUD-GCP`);
+
+
+        Array.from(cloudRows).forEach(tr => {
+          if (cloudVendor == 'AWS' || cloudVendor == 'GCP') {
+            if (tr.classList.contains(`CLOUD-${cloudVendor}`)) {
+              tr.classList.remove('hide-row');
+            } else {
+              tr.classList.add('hide-row');
+            }
+          } else {
+            tr.classList.remove('hide-row');
+          }
+        })
+        if (roleID) {
+          const allRoles = document.querySelectorAll('.single-role-popup-data')
+          allRoles.forEach(roleContent => {
+            roleContent.style.display = 'none';
+          })
+          const current = document.getElementById(`popup-role-${roleID}`);
+          current.style.display = 'block';
+          current.querySelector('.cloud-placeholder').textContent = cloudVendor;
+        }
+      }
+    }
+    function generatePopupDataSingleRole(roleObj, popupQuestions, trainingsList, trainingsData) {
+      const content = document.createElement('div');
+      content.id = `popup-role-${roleObj.id}`
+      content.classList.add('single-role-popup-data')
+      content.style.display = 'none';
+
+      const topRow = document.createElement('div');
+      topRow.className = "popup-top-row";
+
+      const filler = document.createElement('div');
+      filler.className = "flex-item";
+      // Create the close button
+      const closeButton = document.createElement('span');
+      closeButton.className = 'close-btn';
+      closeButton.innerHTML = '&times;';
+      closeButton.onclick = () => { displayRolePopup(false) }
+      filler.appendChild(closeButton);
+
+      const roleTitle = document.createElement('h2');
+      roleTitle.textContent = roleObj.name;
+      roleTitle.className = "flex-item";
+
+      const btnContainer = document.createElement('div');
+      btnContainer.className = "flex-item";
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = 'שמור';
+      saveBtn.onclick = () => displayRolePopup(false)
+      btnContainer.appendChild(saveBtn);
+
+      topRow.appendChild(filler);
+      topRow.appendChild(roleTitle);
+      topRow.appendChild(btnContainer);
+      content.appendChild(topRow);
+
+      const roleDesc = document.createElement('h4');
+      roleDesc.textContent = roleObj.desc;
+      content.appendChild(roleDesc);
+
+      const cloud = document.createElement('div');
+      cloud.className = "cloud-data";
+
+      const cloudLabel = document.createElement('span');
+      cloudLabel.textContent = "הכשרות בסביבת ענן:"
+      cloudLabel.className = "cloud-label";
+
+      const cloudVendor = document.createElement('span');
+      cloudVendor.className = "cloud-placeholder";
+
+      cloud.appendChild(cloudLabel);
+      cloud.appendChild(cloudVendor);
+      content.appendChild(cloud);
+
+      // Column headers
+      const tableQuestions = popupQuestions.filter(q => (q.ques_name == "Training_1"))
+      const headersList = [...tableQuestions];
+      headersList.unshift({question: "שם ההכשרה", ques_name: 'row_title', type: "Fixed"}); // first
+      
+      if (trainingsList.some(t => t.managmentJourney)) { // if some have managmentJourney
+        const groupedTrainings = trainingsList.reduce((result, t) => {
+          (result[t.managmentJourney] = result[t.managmentJourney] || []).push(t);
+          return result;
+        }, {});
+
+        Object.entries(groupedTrainings).forEach(([journey, journeyTrainings]) => {
+          const journeyContainer = document.createElement('div');
+          journeyContainer.className = "training-journey-container";
+          const h3 = document.createElement('h3');
+          h3.textContent = journey;
+          const table = createTrainingPageGenericTable('training', headersList, journeyTrainings, trainingsData, roleObj.id)
+          
+          journeyContainer.appendChild(h3);
+          journeyContainer.appendChild(table);
+          content.appendChild(journeyContainer);
+        });
+
+      } else {
+        const table = createTrainingPageGenericTable('training', headersList, trainingsList, trainingsData, roleObj.id)
+        content.appendChild(table);
+      }
+      return content;
+
+    }
+    function generateTrainingPagePopupAndContent(questionData, sectionData) {
+      // Create the popup
+      const popup = document.createElement('div');
+      popup.className = 'hide';
+      popup.id = 'role-popup';
+      document.getElementById(`page${pageNumberByName['Training']}`).appendChild(popup);
+
+      // Create the popup content
+      const popupContent = document.createElement('div');
+      popupContent.className = 'popup-content';
+
+      const popupQuestions = questionData.filter(q => (q.position == 'Popup'))
+      sectionData.allRoles.forEach(role => {
+        const content = generatePopupDataSingleRole(
+          role,
+          popupQuestions,
+          sectionData.allTrainings[role.trainingPathID] || [],
+          sectionData.depTrainingData[role.id] || {}
+        );
+
+        const extraQ = popupQuestions.filter(q => (q.ques_name == "Training_Roles_3"))
+        let extraInput;
+        if (extraQ.length) {
+          const q = {...extraQ[0]};
+          q.answer = sectionData.depRolesData[role.id] ? sectionData.depRolesData[role.id][extraQ[0].ques_name] : ""
+          q.ques_name = `${extraQ[0].ques_name},Role_ID=${role.id}`
+          extraInput = generateFullInput(q)
+        }
+
+        content.appendChild(extraInput)
+        popupContent.appendChild(content)
+      })
+      popup.appendChild(popupContent);
     }
     
     function populateQuestionsMSPage(questionData, all_milestones_options, milestones, milestones_ans, pageNumber) {
@@ -1114,11 +1422,26 @@
       questionsDiv.appendChild(table);
       finishLoad();
     }
-    function createOpenTrainingsPopupCell() {
+    function createOpenTrainingsPopupCell(roleID, tr) {
       const container = document.createElement('div');
-      container.style.margin = "auto"
+      container.style.margin = "auto";
+
       const openBtn = document.createElement('button');
-      openBtn.innerHTML = '<i class="fa fa-solid fa-plus"></i>';
+      openBtn.className = "expand-btn";
+
+      const infoText = document.createElement('span');
+      infoText.classList.add('tooltiptext');
+      infoText.innerHTML = "נא למלא מספר בעלי תפקיד.";
+      openBtn.appendChild(infoText);
+
+      handleRoleOpenBtn(tr, openBtn);
+
+      const img = document.createElement('img');
+      img.className = "expand-icon";
+      img.src = "https://i.ibb.co/9NqLCWw/expand.png";
+      img.alt = "expand"
+      openBtn.onclick = () => { displayRolePopup(true, roleID) }
+      openBtn.appendChild(img);
       container.appendChild(openBtn);
       return container;
     }
@@ -1322,6 +1645,9 @@
     // btnClickd: 'next' or 'prev'
     function getCorrectedNextPage(btnClickd) {
       // if not funded- no page MS!
+      if (global_currentPage == 5 && btnClickd == 'next') {// last page save and stay
+        return 5
+      }
       let newPage = (btnClickd == 'next') ? global_currentPage + 1 : global_currentPage - 1;
       if (!global_currentProject.isFunded && newPage == pageNumberByName['MS']) {
         newPage = (btnClickd == 'next') ? newPage + 1 : newPage - 1;
@@ -1329,6 +1655,9 @@
       return newPage;
     }
 
+    function saveAndQuit() {
+      saveAndChangePage(6, null);
+    }
     function nextPage() {
       const newPage = getCorrectedNextPage('next'); // if num6 its for finish!
       saveAndChangePage(newPage, null);
@@ -1368,21 +1697,29 @@
       const simpleTypes = ['select-one', 'text', 'number', 'date']
       if (simpleTypes.includes(input.type)) {
         answers[input.name] = input.value.trim();
-
-        if (input.required && !answers[input.name]) {
-          const wrapDiv = input.closest(".single-question-container");
-          global_missing_required[page].push(wrapDiv['id'])
-        }
       }
       if (input.classList.contains("multi-checkbox-div")) { // multi
         const checked = input.querySelectorAll('input[type="checkbox"]:checked');
         const selectedOptions = Array.from(checked).map(c => c.value);;
         answers[input.id] = selectedOptions.join('$'); // Save selected options separated by $
       }
-      return answers
+      if (input.required && !answers[input.name] && !answers[input.id]) {
+        const wrapDiv = input.closest(".single-question-container");
+        global_missing_required[page].push(wrapDiv['id'])
+      }
+      if (input.name) {
+        if (answers[input.name] == "") {
+          delete answers[input.name];
+        }
+      } else if (input.id) {
+        if (answers[input.id] == "") {
+          delete answers[input.id];
+        }
+      }
+      return answers;
     }
 
-    function savePageAnswers(pageNum, prevProjectId, finish) {
+    function savePageAnswers(pageNum, prevProjectId, finish, checkRequired) {
       global_missing_required[pageNum] = []
       let answers = {};
       // exclude multi-option, because it has a div wrapper (.multi-checkbox-div)
@@ -1404,7 +1741,7 @@
           errorMessage += global_missing_required[j].join(', ');
           allGood = false;
         }
-        if (!allGood) {
+        if (!allGood) { // error on the way
           alert(errorMessage);
           return false;
         }
@@ -1418,7 +1755,7 @@
       // if (prevProjectId) use it
       const projectId = prevProjectId || global_currentProject.id;
       google.script.run.saveNewAnswers(pageNum, answers, projectId, global_myDep.id);
-      return true
+      return true;
     }
 
     function putTooltips() {

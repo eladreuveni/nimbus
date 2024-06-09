@@ -1501,6 +1501,7 @@
         mlTitle.textContent = milestones[ml_stone_id].ml_title; // Name of the milestone
         textContainer.appendChild(mlTitle);
         if (milestones[ml_stone_id].required) {
+          row.classList.add('required-row')
           const requiredStar = document.createElement('span');
           requiredStar.textContent = '*';
           requiredStar.classList.add('required-star');
@@ -1646,6 +1647,8 @@
     function getCorrectedNextPage(btnClickd) {
       // if not funded- no page MS!
       if (global_currentPage == 5 && btnClickd == 'next') {// last page save and stay
+        const msg = "הנתונים נשמרים!" + "\n" + "ניתן להמשיך ולענות על שאלות."
+        alert(msg);
         return 5
       }
       let newPage = (btnClickd == 'next') ? global_currentPage + 1 : global_currentPage - 1;
@@ -1670,26 +1673,36 @@
       }
     }
 
+    function msInputRequiredByName(inputName) {
+      const questions = ["MS_Name", "MS_End_Date", "MS_Status"];
+      return questions.some(q => inputName.includes(q));
+    }
+    function saveMSInputs(page) {
+      const answers = {}
+      const trElements = document.querySelectorAll('#page' + page + ' tr'); 
+      trElements.forEach(function(tr, index) {
+        if (tr.id !== 'header-row'){
+          const isRowRequired = tr.classList.contains('required-row');
+          let addToMissing = false;
+          const rowAnswers = []; // for storing answers for this row
+          const rowInputs = tr.querySelectorAll('input, select, textarea');
+          rowInputs.forEach(function(rowInput) {
+            if (isRowRequired && msInputRequiredByName(rowInput.name) && rowInput.value == "") {
+              addToMissing = true;
+            }
+            rowAnswers.push(rowInput.value); 
+          });
+          if (rowAnswers.length == 8){// its usually 7. so it means this row was created by clicking 'Add'. change this to better implementation
+            rowAnswers.shift();
+          }
+          if (addToMissing) { global_missing_required[page].push(index) }      
+          answers[tr.id] = rowAnswers; // store row answers with row ID as key
+        }
+      });
+      return answers;
+    }
     function saveSingleInput(input, page) {
       const answers = {}
-
-      if (page == pageNumberByName['MS']) {// mabey implement it better later
-        const trElements = document.querySelectorAll('#page' + page + ' tr'); 
-        trElements.forEach(function(tr) {
-          if (tr.id !== 'header-row'){
-            const rowAnswers = []; // for storing answers for this row
-            const rowInputs = tr.querySelectorAll('input, select, textarea'); 
-            rowInputs.forEach(function(rowInput) {
-              rowAnswers.push(rowInput.value); 
-            });
-            if (rowAnswers.length == 8){// its usually 7. so it means this row was created by clicking 'Add'. change this to better implementation
-              rowAnswers.shift();
-            }
-            answers[tr.id] = rowAnswers; // store row answers with row ID as key
-          }
-        });
-        return answers
-      }
       // pages no MS
       if (input.type == 'radio') {
         if (input.checked) { answers[input.name] = input.value.trim() }
@@ -1719,17 +1732,21 @@
       return answers;
     }
 
-    function savePageAnswers(pageNum, prevProjectId, finish, checkRequired) {
+    function savePageAnswers(pageNum, prevProjectId, finish) {
       global_missing_required[pageNum] = []
       let answers = {};
       // exclude multi-option, because it has a div wrapper (.multi-checkbox-div)
       const inputElements = document.querySelectorAll(
         `#page${pageNum} input:not([type="checkbox"]), #page${pageNum} select, #page${pageNum} .multi-checkbox-div`
       );
-      inputElements.forEach((input) => {
-        const ansObj = saveSingleInput(input, pageNum)
-        answers = { ...ansObj, ...answers }
-      });
+      if (pageNum == pageNumberByName['MS']) {
+        answers = saveMSInputs(pageNum);
+      } else {
+        inputElements.forEach((input) => {
+          const ansObj = saveSingleInput(input, pageNum)
+          answers = { ...ansObj, ...answers }
+        });
+      }
       let errorMessage = "";
       if (finish) {
         errorMessage = "שים לב, לא ענית על מספר שאלות חובה בשאלון:\n";
@@ -1737,7 +1754,11 @@
         let allGood = true;
         for (let j=1; j<=5; j++) {
           if (!global_missing_required[j].length) { continue }
-          errorMessage += '\n' + `בעמוד ${j}, שאלות: `
+          if (j == pageNumberByName['MS']) {
+            errorMessage += '\n' + `בעמוד ${j}, שורות: `
+          } else {
+            errorMessage += '\n' + `בעמוד ${j}, שאלות: `
+          }
           errorMessage += global_missing_required[j].join(', ');
           allGood = false;
         }
@@ -1747,7 +1768,11 @@
         }
       } else { // not finish
         if (global_missing_required[pageNum].length > 0) {
-          errorMessage = "שים לב, לא ענית על מספר שאלות חובה בעמוד זה: \n";
+          if (pageNum == pageNumberByName['MS']) {
+            errorMessage = "שים לב, לא ענית על מספר אבני דרך חובה בעמוד זה, בשורות: \n";
+          } else {
+            errorMessage = "שים לב, לא ענית על מספר שאלות חובה בעמוד זה: \n";
+          }
           errorMessage += global_missing_required[pageNum].join(', ');
           alert(errorMessage);
         }

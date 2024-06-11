@@ -120,7 +120,7 @@ function authenticateByToken(token){
 
 
 function getAllowedEmails() {
-  const users_sheet_cols = getSheetColIndexes(users_sheet)
+  const users_sheet_cols = getSheetColIndexes(users_sheet);
   const numRows = users_sheet.getLastRow() - 1; // exclude the first row
   const user_emails = users_sheet.getRange(2, users_sheet_cols['User_Mail'] + 1, numRows).getValues().flat();
   return user_emails.filter(Boolean);
@@ -397,14 +397,15 @@ function saveNewAnswers(page, answers, user_proj_id, user_dep_id) {
     saveMSAnswers(answers, user_proj_id, curr_time);
     return true
   }
+  if (page == pagePrefixToNumber['Training']) {
+    saveTrainingAnswers(answers, user_dep_id, curr_time);
+    return true;
+  }
   let id_col_name;
   let proj_o_dep_id;
   if (page == pagePrefixToNumber['DT']) {
     id_col_name = "DT_Project_ID";
     proj_o_dep_id = user_proj_id;
-  } else if (page == pagePrefixToNumber['Training']) {
-    id_col_name = "Dep_ID"
-    proj_o_dep_id = user_dep_id;
   } else { // readiness or barrier
     id_col_name = "Project_Dep_ID";
     proj_o_dep_id = user_dep_id;
@@ -421,7 +422,7 @@ function handlePageAns(answers, proj_or_dep_id, proj_or_dep_col, curr_sheet, cur
   const sheet_col_indexes = headersArrToIndexesObj(headers);
   
   const myAnswersInd = usersAnswers.findIndex((row) => row[sheet_col_indexes[proj_or_dep_col]] == proj_or_dep_id);
-  let sheetsIndex = (myAnswersInd == -1) ? curr_sheet.getLastRow()+1 : myAnswersInd+2; 
+  let sheetsIndex = (myAnswersInd == -1) ? curr_sheet.getLastRow()+1 : myAnswersInd+2; // +2 bcouse of headers and indexes start at 1
 
   const readyForSheets = [];
   headers.forEach((ques, i) => {
@@ -433,6 +434,21 @@ function handlePageAns(answers, proj_or_dep_id, proj_or_dep_col, curr_sheet, cur
   })
 
   curr_sheet.getRange(sheetsIndex, 1, 1, curr_sheet.getLastColumn()).setValues([readyForSheets]);
+}
+
+function saveTrainingAnswers(answers, depID, curr_time) {
+  const { trainings, trainingGeneral, trainingRoles } = trainingAnswersByPrefix(answers);
+  
+  // general data
+  handlePageAns(trainingGeneral, depID, 'Dep_ID', data_trainings_general, curr_time);
+
+  // trainingRoles data
+  saveTrainingRolesData(trainingRoles, depID, data_roles, curr_time);
+  
+  // trainings data
+  saveTrainingsData(trainings, depID, data_trainings, curr_time);
+  
+  return true;
 }
 
 function saveMSAnswers(answers, user_proj_id, curr_time) {

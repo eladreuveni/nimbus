@@ -118,8 +118,9 @@
         display: flex;
         align-items: center;
       }
-      .single-question-flex div {
+      .single-question-container.single-question-flex div {
         margin-left: 20px;
+        margin-bottom: 0px;
       }
 
       #change-project:disabled {
@@ -138,6 +139,10 @@
         border-radius: 4px;
         box-sizing: border-box;
         font-size: 1.1rem;
+      }
+
+      .input-long {
+        width: 100%;
       }
       label {
         font-size: 1.1rem;
@@ -315,7 +320,7 @@
         margin: 15px;
         cursor: pointer;
         position: relative; /* Make sure buttons have a stacking context */
-        z-index: 2; /* Ensure buttons are above the line */
+        z-index: 1; /* Ensure buttons are above the line */
       }
       .titles-container h5 {
         display: inline-block;
@@ -345,7 +350,7 @@
         top: 50%; /* Position the line at the vertical center of the button container */
         left: 25px; /* Adjust left position to center the line between buttons */
         transform: translateY(-50%);
-        z-index: 1; /* Ensure line is behind the buttons */
+        z-index: 0; /* Ensure line is behind the buttons */
       }
       .add-button-row{
         display: inline-block;
@@ -493,6 +498,79 @@
         text-wrap: wrap;
         line-height: 2rem;
       }
+      .trainings-page-table input[type="number"] {
+        width: 80%;
+      }
+      .role-table td h3 {
+        margin: 1rem 0;
+      }
+      #role-popup {
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      #role-popup.show {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #role-popup.hide {
+        display: none;
+      }
+
+      #role-popup .popup-content {
+        background-color: #fff;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%;
+        max-height: 75%;
+        border-radius: 8px;
+        position: relative;
+        overflow-y: scroll;
+      }
+      .training-table td h3 {
+        font-size: 1rem;
+        margin: 0;
+      }
+      .training-table tr th:first-child {
+        width: 70%;
+      }
+
+      #role-popup .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        cursor: pointer;
+      }
+
+      .single-role-popup-data .sug-training {
+        margin-bottom: 1rem;
+      }
+      .single-role-popup-data .sug-training .training-path-name-span {
+        font-weight: bold;
+      }
+      #role-popup .popup-top-row {
+        display: flex;
+        align-items: center;
+      }
+      #role-popup .popup-top-row div {
+        flex: 1;
+      }
+      #role-popup .popup-top-row h2 {
+        text-align: center;
+        flex: 5;
+      }
+      #role-popup .popup-top-row .flex-item button {
+        margin-right: auto;
+      }
+      
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   </head>
@@ -868,9 +946,10 @@
       }
       return radioContainer;
     }
-    const createInputTypeText = (answer) => {
+    const createInputTypeText = (answer, long) => {
       const inputElement = document.createElement('input');
       if (answer) { inputElement.classList.add('input-gray-bg') }
+      if (long) { inputElement.classList.add('input-long') }
       inputElement.type = 'text';
       inputElement.value = answer || "";
       return inputElement;
@@ -881,7 +960,6 @@
       inputElement.value = answer;
       return inputElement;
     }
-    
     const createInputTypeCheckboxMultiChoice = (options, answer, max_choice) => {
       const inputElement = document.createElement('div');
       inputElement.classList.add('multi-checkbox-div')
@@ -946,8 +1024,9 @@
         'Number': () => createInputTypeNumber(questionObj.answer),
         'Date': () => createInputTypeDate(questionObj.answer),
         'Checkbox_Multi_Choice': () => createInputTypeCheckboxMultiChoice(questionObj.options, questionObj.answer, questionObj.max_choice),
-        'Text': () => createInputTypeText(questionObj.answer),
+        'Text': () => createInputTypeText(questionObj.answer, false),
         'Textarea': () => createInputTypeTextArea(questionObj.answer),
+        'TextLong': () => createInputTypeText(questionObj.answer, true),
       }
       const inputFunc = funcs[questionObj.type];
       const inputElement = inputFunc ? inputFunc() : funcs['Text']() // not suppose to get to Default
@@ -979,33 +1058,27 @@
     }
 
     function renderRolesSection(questionData, sectionData) {
-      return; // page5 disabled
-      const tableQuestions = questionData.filter(q => (q.position == 'Table'))
       const loader = document.getElementById('insert-roles-section-here') // change later when adding real loader
+      loader.innerHTML = "";
       const groupContainer = loader.parentElement;
 
-      const table = document.createElement('table');
-      table.classList.add('question-table');
-      table.id = 'roles-table';
-
-      const colWidths = [25, 25, 25, 25] // hard coded
-      const colgroup = document.createElement('colgroup');
-      for (let i=0; i < colWidths.length; i++) {
-        const col = document.createElement('col');
-        col.style.width = colWidths[i] + '%';
-        colgroup.appendChild(col)
-      }
-      table.appendChild(colgroup)
-
       // Column headers
-      let headerRow = document.createElement('tr');
-      headerRow.id = 'roles-headers';
-
+      const tableQuestions = questionData.filter(q => (q.position == 'Table'))
       const headersList = [...tableQuestions];
-      headersList.unshift({question: "שם התפקיד", ques_name: 'role_name', type: "Fixed"}); // first
+      headersList.unshift({question: "שם התפקיד", ques_name: 'row_title', type: "Fixed"}); // first
       headersList.push({question: "פירוט הכשרות", ques_name: 'open_popup', type: "Fixed"}); // last
 
+      const table = createTrainingPageGenericTable('role', headersList, sectionData.allRoles, sectionData.depRolesData, null)
 
+      groupContainer.appendChild(table)
+      generateTrainingPagePopupAndContent(questionData, sectionData)
+    }
+    function createTrainingPageGenericTable(title, headersList, allItems, dataObject, roleID) {
+      // table setters
+      const table = document.createElement('table');
+      table.classList.add('question-table', 'trainings-page-table', `${title}-table`);
+
+      const headerRow = document.createElement('tr');
       headersList.forEach(questionObj => {
         const headerCell = document.createElement('th');
         headerCell.textContent = questionObj.question;
@@ -1013,36 +1086,147 @@
       });
       table.appendChild(headerRow);
 
-      sectionData.allRoles.forEach((role) => {
+      allItems.forEach((item) => {
         const row = document.createElement('tr');
-          row.id = `role-${role.id}`;
-          row.key = role.id;
+          row.id = `${title}-${item.id}`;
+          row.key = item.id;
             // loop through each question and create cells
             headersList.forEach(questionObj => {
               const cell = document.createElement('td');
               let inputElement;
               if (questionObj.type == 'Fixed') {
-                if (questionObj.ques_name == 'role_name') {
-                  inputElement = document.createElement('h2')
-                  inputElement.textContent = role.name
+                if (questionObj.ques_name == 'row_title') {
+                  inputElement = document.createElement('h3')
+                  inputElement.textContent = item.name
                 } else if (questionObj.ques_name == 'open_popup') {
-                  inputElement = createOpenTrainingsPopupCell(questionObj)
+                  inputElement = createOpenTrainingsPopupCell(item.id)
                 }
               } else {
                 let curr_ans;
-                if (sectionData.depRolesData[role.id]) {
-                  curr_ans = sectionData.depRolesData[role.id][questionObj.ques_name];
+                if (dataObject[item.id]) {
+                  curr_ans = dataObject[item.id][questionObj.ques_name];
                 }
                 questionObj.answer = curr_ans;
                 inputElement = generateOnlyInputByType(questionObj)
-                inputElement.name = questionObj.ques_name + '_' + role.id;
+                const inputName = roleID ? `${questionObj.ques_name},Role_ID=${roleID},Training_ID=${item.id}` : `${questionObj.ques_name},Role_ID=${item.id}`
+                inputElement.name = inputName;
               }
               cell.appendChild(inputElement);
               row.appendChild(cell);
             });
             table.appendChild(row);
       })
-      groupContainer.appendChild(table)
+      return table;
+    }
+    function displayRolePopup(open, roleID) {
+      const popup = document.getElementById('role-popup');
+      popup.className = open ? 'show' : 'hide';
+      if (roleID) {
+        const allRoles = document.querySelectorAll('.single-role-popup-data')
+        allRoles.forEach(roleContent => {
+          roleContent.style.display = 'none';
+        })
+        const current = document.getElementById(`popup-role-${roleID}`);
+        current.style.display = 'block';
+      }
+    }
+    function generatePopupDataSingleRole(roleObj, popupQuestions, trainingsList, trainingsData) {
+      const cloudVendor = document.querySelector('select[name="Training_General_3"]').value;
+
+      const content = document.createElement('div');
+      content.id = `popup-role-${roleObj.id}`
+      content.classList.add('single-role-popup-data')
+      content.style.display = 'none';
+
+      const topRow = document.createElement('div');
+      topRow.className = "popup-top-row";
+
+      const filler = document.createElement('div');
+      filler.className = "flex-item";
+
+      const roleTitle = document.createElement('h2');
+      roleTitle.textContent = roleObj.name;
+      roleTitle.className = "flex-item";
+
+      const btnContainer = document.createElement('div');
+      btnContainer.className = "flex-item";
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = 'שמור';
+      saveBtn.onclick = () => displayRolePopup(false)
+      btnContainer.appendChild(saveBtn);
+
+      topRow.appendChild(filler);
+      topRow.appendChild(roleTitle);
+      topRow.appendChild(btnContainer);
+      content.appendChild(topRow);
+
+      const roleDesc = document.createElement('h4');
+      roleDesc.textContent = roleObj.desc;
+      content.appendChild(roleDesc);
+
+      const trainingTitle = document.createElement('div');
+      trainingTitle.className = "sug-training";
+      const label = document.createElement('span');
+      label.textContent = 'הכשרה מסוג ';
+      const title = document.createElement('span');
+      title.className = "training-path-name-span";
+      title.textContent = roleObj.trainingPath;
+      trainingTitle.appendChild(label);
+      trainingTitle.appendChild(title);
+      content.appendChild(trainingTitle);
+
+      // Column headers
+      const tableQuestions = popupQuestions.filter(q => (q.ques_name == "Training_1"))
+      const headersList = [...tableQuestions];
+      headersList.unshift({question: "שם ההכשרה", ques_name: 'row_title', type: "Fixed"}); // first
+      
+      const table = createTrainingPageGenericTable('training', headersList, trainingsList, trainingsData, roleObj.id)
+      content.appendChild(table);
+
+      return content;
+
+    }
+    function generateTrainingPagePopupAndContent(questionData, sectionData) {
+      // Create the popup
+      const popup = document.createElement('div');
+      popup.className = 'hide';
+      popup.id = 'role-popup';
+      document.getElementById(`page${pageNumberByName['Training']}`).appendChild(popup);
+
+      // Create the popup content
+      const popupContent = document.createElement('div');
+      popupContent.className = 'popup-content';
+
+      const popupQuestions = questionData.filter(q => (q.position == 'Popup'))
+      sectionData.allRoles.forEach(role => {
+        const content = generatePopupDataSingleRole(
+          role,
+          popupQuestions,
+          sectionData.allTrainings[role.trainingPathID] || [],
+          sectionData.depTrainingData[role.id] || {}
+        );
+
+        const extraQ = popupQuestions.filter(q => (q.ques_name == "Training_Roles_3"))
+        let extraInput;
+        if (extraQ.length) {
+          const q = {...extraQ[0]};
+          q.answer = sectionData.depRolesData[role.id] ? sectionData.depRolesData[role.id][extraQ[0].ques_name] : ""
+          q.ques_name = `${extraQ[0].ques_name},Role_ID=${role.id}`
+          extraInput = generateFullInput(q)
+        }
+
+        content.appendChild(extraInput)
+        popupContent.appendChild(content)
+      })
+      popup.appendChild(popupContent);
+
+      // Create the close button
+      const closeButton = document.createElement('span');
+      closeButton.className = 'close-btn';
+      closeButton.id = 'closePopupBtn';
+      closeButton.innerHTML = '&times;';
+      closeButton.onclick = () => { displayRolePopup(false) }
+      popupContent.appendChild(closeButton);
     }
     
     function populateQuestionsMSPage(questionData, all_milestones_options, milestones, milestones_ans, pageNumber) {
@@ -1110,11 +1294,13 @@
       questionsDiv.appendChild(table);
       finishLoad();
     }
-    function createOpenTrainingsPopupCell() {
+    function createOpenTrainingsPopupCell(roleID) {
       const container = document.createElement('div');
       container.style.margin = "auto"
       const openBtn = document.createElement('button');
+      openBtn.style.margin = "auto"
       openBtn.innerHTML = '<i class="fa fa-solid fa-plus"></i>';
+      openBtn.onclick = () => { displayRolePopup(true, roleID) }
       container.appendChild(openBtn);
       return container;
     }
@@ -1265,7 +1451,7 @@
       // Grouping the questions by title
       let questionsGrouped = (pageNum === pageNumberByName['Training']) ? groupQuestionsByPosition(questionData) : groupQuestionsByTitle(questionData);
 
-      if (pageNum === pageNumberByName['Training']) { questionsGrouped = [] } // page Training disabled
+      // if (pageNum === pageNumberByName['Training']) { questionsGrouped = [] } // page Training disabled
       questionsGrouped.forEach((group) => {
         if (!group.length) {return}
         const groupContainer = document.createElement('div'); 
@@ -1411,6 +1597,8 @@
           alert(errorMessage);
         }
       }
+      console.log('answers')
+      console.log(answers)
       // if (prevProjectId) use it
       const projectId = prevProjectId || global_currentProject.id;
       google.script.run.saveNewAnswers(pageNum, answers, projectId, global_myDep.id);

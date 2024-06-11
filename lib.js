@@ -1,28 +1,3 @@
-// function shareSheet() {
-//   const sheetId = ss.getId();
-  
-//   // Assuming the emails are in column A starting from row 1
-//   var emailSheet = ss.getSheetByName("try");
-//   const emails = emailSheet.getRange(2, 2, emailSheet.getLastRow()-1, 1).getValues().flat();
-  
-//   const permissions = DriveApp.getFileById(sheetId).getSharingAccess();
-  
-//   if (permissions == DriveApp.Access.ANYONE_WITH_LINK) {
-//     DriveApp.getFileById(sheetId).setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.EDIT);
-//   }
-
-//   emails.forEach(function(email) {
-//     try {
-//       DriveApp.getFileById(sheetId).addViewer(email);
-//       Logger.log('Shared with: ' + email);
-//     } catch (e) {
-//       Logger.log('Error sharing with ' + email + ': ' + e.toString());
-//     }
-//   });
-  
-//   Logger.log('Sharing completed');
-// }
-
 function getColIndexByTitle(sheet, title) {
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   return headers.indexOf(title); // in case you want to access the col in the sheet and not just with array- add 1.
@@ -104,17 +79,6 @@ function getDepRolesData(depID) {
   })
   return dataRolesByRoleID;
 }
-/**
- * Most complex func.
- * result will look like this:
- * {
- *    [Training_Role_ID]: {
- *        [Training_ID]: {
- *            [Training_(number)]: Answer to that question 
- *        }
- *    }
- * }
- */
 function getSpecificTrainingData(depID) {
   const allDataTrainings = data_trainings.getRange(1, 1, data_trainings.getLastRow(), data_trainings.getLastColumn()).getValues();
   const cols = headersArrToIndexesObj(allDataTrainings.shift());
@@ -126,7 +90,7 @@ function getSpecificTrainingData(depID) {
 
   allDataTrainings.forEach((row) => {
     if (row[cols['Dep_ID']] == depID) {
-      const trainingRoleID = row[cols['Training_Role_ID']];
+      const roleID = row[cols['Role_ID']];
       const trainingID = row[cols['Training_ID']];
       const dataObj = {};
       for (const [qName, qIndex] of Object.entries(cols)) {
@@ -134,8 +98,8 @@ function getSpecificTrainingData(depID) {
           dataObj[qName] = row[qIndex];
         }
       }
-      if (!myDataTrainings[trainingRoleID]) { myDataTrainings[trainingRoleID] = {} }
-      myDataTrainings[trainingRoleID][trainingID] = dataObj;
+      if (!myDataTrainings[roleID]) { myDataTrainings[roleID] = {} }
+      myDataTrainings[roleID][trainingID] = dataObj;
     }
   })
   return myDataTrainings;
@@ -155,14 +119,123 @@ function getAllRolesAndTrainings(depID = 8) {
   return { allRoles, allTrainings, depRolesData, depTrainingData }
 }
 
+function trainingAnswersByPrefix(answers) {
+    const trainings = {};
+    const trainingGeneral = {};
+    const trainingRoles = {};
 
+    for (const key in answers) {
+      if (key.startsWith("Training_General")) {
+        trainingGeneral[key] = answers[key];
+      } else if (key.startsWith("Training_Roles")) {
+        trainingRoles[key] = answers[key];
+      } else if (key.includes("Training_ID")) {
+        trainings[key] = answers[key];
+      }
+    }
+    return { trainings, trainingGeneral, trainingRoles };
+}
+function groupByRoleId(data) {
+  const groupedData = {};
 
+  for (const key in data) {
+    const roleIdMatch = key.match(/Role_ID=(\d+)/);
+    if (roleIdMatch) {
+      const roleId = roleIdMatch[1];
+      if (!groupedData[roleId]) {
+        groupedData[roleId] = {};
+      }
+      groupedData[roleId][key.split(',')[0]] = data[key];
+    }
+  }
 
+  return groupedData;
+}
 
+function saveTrainingRolesData(trainingRoles, depID, sheet, curr_time) {
+  const currAnswers = sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn()).getValues();
+  const headers = currAnswers.shift();
 
+  const cleaned = {};
+  for (const key in trainingRoles) {
+    if (trainingRoles[key] !== "") {
+      cleaned[key] = trainingRoles[key];
+    }
+  }  
+  const byRoleID = groupByRoleId(cleaned);
+  const answers = [];
 
+  for (const roleID in byRoleID) {
+    const singleRole = []
+    headers.forEach((ques) => {
+      let ans = "";
+      if (ques == 'Dep_ID') { ans = depID }
+      else if (ques == 'Role_ID') { ans = roleID }
+      else if (ques == "Last_Updated") { ans = curr_time }
+      else { ans = byRoleID[roleID][ques] || "" }
+      singleRole.push(ans);
+    })
+    answers.push(singleRole);
+  }
 
+  // Determine the starting row
+  const startRow = sheet.getLastRow() + 1;
+  const startCol = 1; // Assuming data starts at the first column
+  
+  // Get the range where the data will be inserted
+  const range = sheet.getRange(startRow, startCol, answers.length, answers[0] ? answers[0].length : 0);
+  
+  // Set the values in the range
+  range.setValues(answers);
+  // deleteOldData(sheet, currAnswers, headers, depID, 'Dep_ID')
+}
+function saveTrainingsData(trainings, depID, sheet, curr_time) {
+  const currAnswers = sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn()).getValues();
+  const headers = currAnswers.shift();
+  
+  const answers = [];
+  for (const t in trainings) { // currently because only one question
+    if (trainings[t] == "") {
+      continue;
+    }
+    const [ques_name, roleID, trainingID] = t.split(',');
+    const singleTAns = []
+    headers.forEach((ques) => {
+      let ans = "";
+      if (ques == 'Dep_ID') { ans = depID }
+      else if (ques == 'Role_ID') { ans = roleID.split('=')[1] }
+      else if (ques == 'Training_ID') { ans = trainingID.split('=')[1] }
+      else if (ques == "Last_Updated") { ans = curr_time }
+      else { ans = trainings[t] || "" }
+      singleTAns.push(ans);
+    })
+    answers.push(singleTAns);
+  }
 
+  // Determine the starting row
+  const startRow = sheet.getLastRow() + 1;
+  const startCol = 1; // Assuming data starts at the first column
+  
+  // Get the range where the data will be inserted
+  const range = sheet.getRange(startRow, startCol, answers.length, answers[0] ? answers[0].length : 0);
+  
+  // Set the values in the range
+  range.setValues(answers);
+  // deleteOldData(sheet, currAnswers, headers, depID, 'Dep_ID')
+}
 
+function deleteOldData(sheet, data, headers, depID, depID_colName) {
+  // Collect the rows to delete
+  const rowsToDelete = [];
+  for (let i = 0; i < data.length; i++) {
+    console.log(data[i])
+    if (data[i][headers[depID_colName]] == depID) {
+      rowsToDelete.push(i + 1);
+    }
+  }
 
-
+  // Delete the rows from bottom to top
+  for (let j = rowsToDelete.length - 1; j >= 0; j--) {
+    sheet.deleteRow(rowsToDelete[j]);
+  }
+}

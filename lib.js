@@ -63,51 +63,50 @@ function getCloudTrainings(allRoles) {
 function getDepRolesData(depID) {
   const allDataRoles = data_roles.getRange(1, 1, data_roles.getLastRow(), data_roles.getLastColumn()).getValues();
   const cols = headersArrToIndexesObj(allDataRoles.shift());
+  let depDataRoles = allDataRoles.filter(row => (row[cols['Dep_ID']] == depID))
+  depDataRoles = keepLatestAnswers(depDataRoles, cols['Last_Updated'])
   const dataRolesByRoleID = {};
 
-  allDataRoles.forEach((row) => {
-    if (row[cols['Dep_ID']] == depID) {
-      const roleID = row[cols['Role_ID']];
-      const dataObj = {};
-      for (const [qName, qIndex] of Object.entries(cols)) {
-        if (qName.startsWith('Training_Roles')) {
-          dataObj[qName] = row[qIndex];
-        }
+  depDataRoles.forEach((row) => {
+    const roleID = row[cols['Role_ID']];
+    const dataObj = {};
+    for (const [qName, qIndex] of Object.entries(cols)) {
+      if (qName.startsWith('Training_Roles')) {
+        dataObj[qName] = row[qIndex];
       }
-      dataRolesByRoleID[roleID] = (dataObj);
     }
+    dataRolesByRoleID[roleID] = (dataObj);
   })
   return dataRolesByRoleID;
 }
 function getSpecificTrainingData(depID) {
   const allDataTrainings = data_trainings.getRange(1, 1, data_trainings.getLastRow(), data_trainings.getLastColumn()).getValues();
   const cols = headersArrToIndexesObj(allDataTrainings.shift());
-  
+  let depDataTrainings = allDataTrainings.filter(row => (row[cols['Dep_ID']] == depID))
+  depDataTrainings = keepLatestAnswers(depDataTrainings, cols['Last_Updated'])
   const myDataTrainings = {};
 
   // test if value question
   const regex = /^Training_\d+$/;
 
-  allDataTrainings.forEach((row) => {
-    if (row[cols['Dep_ID']] == depID) {
-      const roleID = row[cols['Role_ID']];
-      const trainingID = row[cols['Training_ID']];
-      const dataObj = {};
-      for (const [qName, qIndex] of Object.entries(cols)) {
-        if (regex.test(qName)) {
-          dataObj[qName] = row[qIndex];
-        }
+  depDataTrainings.forEach((row) => {
+    const roleID = row[cols['Role_ID']];
+    const trainingID = row[cols['Training_ID']];
+    const dataObj = {};
+    for (const [qName, qIndex] of Object.entries(cols)) {
+      if (regex.test(qName)) {
+        dataObj[qName] = row[qIndex];
       }
-      if (!myDataTrainings[roleID]) { myDataTrainings[roleID] = {} }
-      myDataTrainings[roleID][trainingID] = dataObj;
     }
+    if (!myDataTrainings[roleID]) { myDataTrainings[roleID] = {} }
+    myDataTrainings[roleID][trainingID] = dataObj;
   })
   return myDataTrainings;
 }
 /**
  * Here I compose the Babushka for page5's complex section
  */
-function getAllRolesAndTrainings(depID = 8) {
+function getAllRolesAndTrainings(depID) {
   // survey general data
   const allRoles = getCloudRoles();
   const allTrainings = getCloudTrainings(allRoles);
@@ -187,7 +186,6 @@ function saveTrainingRolesData(trainingRoles, depID, sheet, curr_time) {
   
   // Set the values in the range
   range.setValues(answers);
-  // deleteOldData(sheet, currAnswers, headers, depID, 'Dep_ID')
 }
 function saveTrainingsData(trainings, depID, sheet, curr_time) {
   const currAnswers = sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn()).getValues();
@@ -221,21 +219,24 @@ function saveTrainingsData(trainings, depID, sheet, curr_time) {
   
   // Set the values in the range
   range.setValues(answers);
-  // deleteOldData(sheet, currAnswers, headers, depID, 'Dep_ID')
 }
 
-function deleteOldData(sheet, data, headers, depID, depID_colName) {
-  // Collect the rows to delete
-  const rowsToDelete = [];
-  for (let i = 0; i < data.length; i++) {
-    console.log(data[i])
-    if (data[i][headers[depID_colName]] == depID) {
-      rowsToDelete.push(i + 1);
-    }
-  }
+// Latest Answers assume that all the last answers have the same last_updated
+function keepLatestAnswers(data, last_updated_index, name_index) {
+    // Find the most recent date
+    let mostRecentDate = new Date(0); // Initialize with a very old date
+    data.forEach(function(entry) {
+        const entryDate = new Date(entry[last_updated_index]);
+        if (entryDate > mostRecentDate) {
+            mostRecentDate = entryDate;
+        }
+    });
 
-  // Delete the rows from bottom to top
-  for (let j = rowsToDelete.length - 1; j >= 0; j--) {
-    sheet.deleteRow(rowsToDelete[j]);
-  }
+    // Filter out items with dates other than the most recent date
+    const filteredData = data.filter(function(entry) {
+        if (name_index && !entry[name_index]) { return false } // ignore ones without ms name
+        const entryDate = new Date(entry[last_updated_index]);
+        return (entryDate.getTime() === mostRecentDate.getTime());
+    });
+    return filteredData;
 }

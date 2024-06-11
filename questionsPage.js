@@ -196,7 +196,7 @@ function getMyRolesAndTrainings(depID) {
   }
   catch (e) {
     console.error(e)
-    return false;
+    return e;
   }
 }
 
@@ -438,16 +438,19 @@ function handlePageAns(answers, proj_or_dep_id, proj_or_dep_col, curr_sheet, cur
 
 function saveTrainingAnswers(answers, depID, curr_time) {
   const { trainings, trainingGeneral, trainingRoles } = trainingAnswersByPrefix(answers);
-  
   // general data
-  handlePageAns(trainingGeneral, depID, 'Dep_ID', data_trainings_general, curr_time);
+  if (Object.keys(trainingGeneral).length) {
+    handlePageAns(trainingGeneral, depID, 'Dep_ID', data_trainings_general, curr_time);
+  }
 
   // trainingRoles data
-  saveTrainingRolesData(trainingRoles, depID, data_roles, curr_time);
-  
+  if (Object.keys(trainingRoles).length) {
+    saveTrainingRolesData(trainingRoles, depID, data_roles, curr_time);
+  }
   // trainings data
-  saveTrainingsData(trainings, depID, data_trainings, curr_time);
-  
+  if (Object.keys(trainings).length) {
+    saveTrainingsData(trainings, depID, data_trainings, curr_time);
+  }
   return true;
 }
 
@@ -463,50 +466,30 @@ function saveMSAnswers(answers, user_proj_id, curr_time) {
 }
 
 function getMilesStonesData(user_proj_id){
-  const ms_data_sheet_cols = getSheetColIndexes(data_mile_stones)
+  const cols = getSheetColIndexes(data_mile_stones)
 
   const all_ms_answers = data_mile_stones.getRange(2, 1, data_mile_stones.getLastRow() - 1,data_mile_stones.getLastColumn()).getValues();
-  let proj_ms_answers = all_ms_answers.filter(ms => (ms[ms_data_sheet_cols['MS_Project_ID']] == user_proj_id))
-  proj_ms_answers = keepLatestAnswers(proj_ms_answers, ms_data_sheet_cols['MS_Name'], ms_data_sheet_cols['Last_Updated'])
+  let proj_ms_answers = all_ms_answers.filter(ms => (ms[cols['MS_Project_ID']] == user_proj_id))
+  proj_ms_answers = keepLatestAnswers(proj_ms_answers, cols['Last_Updated'], cols['MS_Name'])
 
   const miles_stone_ans = {};
   proj_ms_answers.forEach(msa => {
-    let ml_stone_id = msa[ms_data_sheet_cols['MS_Mile_Stone_ID']];
-    let ml_unique_id = msa[ms_data_sheet_cols['MS_Unique_ID']];
-    let ml_start_date = msa[ms_data_sheet_cols['MS_Start_Date']];
-    let ml_end_date = msa[ms_data_sheet_cols['MS_End_Date']];
+    let ml_stone_id = msa[cols['MS_Mile_Stone_ID']];
+    let ml_unique_id = msa[cols['MS_Unique_ID']];
+    let ml_start_date = msa[cols['MS_Start_Date']];
+    let ml_end_date = msa[cols['MS_End_Date']];
     if (ml_start_date) { ml_start_date = ml_start_date.toString() }
     if (ml_end_date) { ml_end_date = ml_end_date.toString() }
     // I can do it because the questions in section 2 are fixed and you always have them all.
     miles_stone_ans[ml_stone_id+'_'+ml_unique_id] = {
-      'MS_Name': msa[ms_data_sheet_cols['MS_Name']],
+      'MS_Name': msa[cols['MS_Name']],
       'MS_Start_Date': ml_start_date,
       'MS_End_Date': ml_end_date,
-      'MS_Status': msa[ms_data_sheet_cols['MS_Status']],
-      'MS_Buying_Required': msa[ms_data_sheet_cols['MS_Buying_Required']],
-      'MS_Product_Desc': msa[ms_data_sheet_cols['MS_Product_Desc']],
-      'MS_Product_Done': msa[ms_data_sheet_cols['MS_Product_Done']]
+      'MS_Status': msa[cols['MS_Status']],
+      'MS_Buying_Required': msa[cols['MS_Buying_Required']],
+      'MS_Product_Desc': msa[cols['MS_Product_Desc']],
+      'MS_Product_Done': msa[cols['MS_Product_Done']]
     };
   })
   return miles_stone_ans;
-}
-
-// Latest Answers assume that all the last answers have the same last_updated
-function keepLatestAnswers(data, ms_name_index, last_updated_index) {
-    // Find the most recent date
-    let mostRecentDate = new Date(0); // Initialize with a very old date
-    data.forEach(function(entry) {
-        const entryDate = new Date(entry[last_updated_index]);
-        if (entryDate > mostRecentDate) {
-            mostRecentDate = entryDate;
-        }
-    });
-
-    // Filter out items with dates other than the most recent date
-    const filteredData = data.filter(function(entry) {
-        if (!entry[ms_name_index]) { return false } // ignore ones without ms name
-        const entryDate = new Date(entry[last_updated_index]);
-        return (entryDate.getTime() === mostRecentDate.getTime());
-    });
-    return filteredData;
 }

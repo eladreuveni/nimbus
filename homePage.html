@@ -318,7 +318,6 @@
         cursor: pointer;
         position: relative; /* Make sure buttons have a stacking context */
         z-index: 1; /* Ensure buttons are above the line */
-      }
 
       .number-button:disabled {
         cursor: not-allowed;
@@ -537,7 +536,6 @@
       .training-table tr th:first-child {
         width: 70%;
       }
-
       .trainings-page-table .roles-table-name-cell {
         display: flex;
         justify-content: center;
@@ -610,7 +608,6 @@
         align-items: center;
         height: 100vh;
       }
-
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   </head>
@@ -1124,10 +1121,10 @@
       headersList.push({question: "פירוט הכשרות", ques_name: 'open_popup', type: "Fixed"}); // last
 
       const table = createTrainingPageGenericTable('role', headersList, sectionData.allRoles, sectionData.depRolesData, null)
-
       groupContainer.appendChild(table)
       generateTrainingPagePopupAndContent(questionData, sectionData)
     }
+    
     function createTrainingPageGenericTable(title, headersList, allItems, dataObject, roleID) {
       // table setters
       const table = document.createElement('table');
@@ -1777,6 +1774,8 @@
           alert(errorMessage);
         }
       }
+      console.log('answers')
+      console.log(answers)
       // if (prevProjectId) use it
       const projectId = prevProjectId || global_currentProject.id;
       google.script.run.saveNewAnswers(pageNum, answers, projectId, global_myDep.id);
